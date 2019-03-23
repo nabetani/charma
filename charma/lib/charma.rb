@@ -78,6 +78,20 @@ module Charma
         [f[t],f[t+1],f[t+2]].join
       }
     end
+
+    def draw_samesize_texts( pdf, rects, texts, opts={} )
+      inf = 1e100
+      pdf.save_graphics_state do
+        size = texts.zip(rects).map{ |txt,rc|
+          w = pdf.width_of(txt, size:1)
+          h = pdf.height_of(txt, size:1)
+          [rc.w.to_f/w ,rc.h.to_f/h].min
+        }.min
+        texts.zip(rects).each do |txt, rc|
+          draw_text( pdf, rc, txt, size:size, **opts )
+        end
+      end
+    end
   end
 
   class BarChart < Chart
@@ -109,29 +123,20 @@ module Charma
     end
 
     def render_xticks(pdf, area)
-      pdf.save_graphics_state do
-        xt = @opts[:x_ticks]
-        w, h = xt.inject( [0,0] ) do |acc,txt|
-          [
-            [acc[0], pdf.width_of(txt, size:1)].max,
-            [acc[1], pdf.height_of(txt, size:1)].max
-          ]
-        end
-        rects = area.hsplit(*Array.new(xt.size){ 1 }).map{ |rc0|
-          rc0.hsplit(1,8,1)[1]
-        }
-        size = [rects[0].w/w, rects[0].h/h].min
-        xt.zip(rects).each do |txt, rc|
-          draw_text( pdf, rc, txt, valign: :top, size:size )
-        end
-      end
+      rects = area.hsplit(*Array.new(@opts[:x_ticks].size){ 1 }).map{ |rc0|
+        rc0.hsplit(1,8,1)[1]
+      }
+      draw_samesize_texts( pdf, rects, @opts[:x_ticks], valign: :top )
+    end
+
+    def render_yticks(pdf, area)
     end
 
     def render( pdf, rect )
       stroke_rect(pdf, rect)
       title_text = @opts[:title]
       title, main, ticks, bottom = rect.vsplit(
-        (title_text ? 1 : 0), 
+        (title_text ? 1 : 0),
         7, 
         (@opts[:x_ticks] ? 0.5 : 0),
         1 )
@@ -140,11 +145,13 @@ module Charma
       ytick, chart = main.hsplit(*hratio)
       ymin = [0, @opts[:y_values].min * 1.1].min
       ymax = [0, @opts[:y_values].max * 1.1].max
-      render_chart(pdf, chart, [ymin, ymax])
+      yrange = [ymin, ymax]
+      render_chart(pdf, chart, yrange)
       if @opts[:x_ticks]
         _, xticks = ticks.hsplit(*hratio)
         render_xticks(pdf, xticks)
       end
+      #render_yticks(pdf, yticks, yrange)
     end
   end
 
