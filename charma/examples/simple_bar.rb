@@ -22,9 +22,32 @@ Charma::Document.new{ |doc|
       x_ticks: %w(Alcyone Atlas Electra Maia Merope Taygeta Pleione),
       y_label: "Random Number",
     },
+    [
+      {
+        y_values:[6,8,3,17,-12,38],
+        title:"salamander",
+      },
+      {
+        y_values:[100,-4,-8,14,-17,57],
+        title:"gradius",
+      },
+    ],
+    Array.new(11){ |n|
+      {
+        y_values: Array.new(7){ rand+rand-rand },
+        title:"graph #{n}",
+      }
+    }
   ].each do |opts|
     doc.new_page do |page|
-      page.add_barchart( opts )
+      case opts
+      when Hash
+        page.add_barchart( opts )
+      when Array
+        opts.each{ |o| page.add_barchart( o ) }
+      else
+        raise "unexpected input #{opts.inspect}"
+      end
     end
   end
 }.render( "simple_bar.pdf" )
