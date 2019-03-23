@@ -187,6 +187,7 @@ module Charma
 
     def render_y_grid(pdf, area, yrange, values)
       pdf.save_graphics_state do
+        pdf.line_width = 0.5
         values.each do |v|
           if v==0
             pdf.stroke_color "000000"
