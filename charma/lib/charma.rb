@@ -163,8 +163,8 @@ module Charma
     def tick_unit(v)
       base = (10**Math.log10(v).round).to_f
       man = v/base
-      return 0.5*base if man<0.7
-      return base if man<1.5
+      return 0.5*base if man<0.6
+      return base if man<1.2
       base*2
     end
 
