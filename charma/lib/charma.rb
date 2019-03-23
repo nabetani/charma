@@ -110,12 +110,16 @@ module Charma
       fill_rect( pdf, bar, col )
     end
 
+    def abs_y_positoin(v, rc, yrange)
+      (v-yrange[0]) * rc.h / (yrange[1]-yrange[0]) + rc.bottom
+    end
+
     def render_chart(pdf, rect, yrange)
       stroke_rect(pdf, rect)
       y_values = @opts[:y_values].map(&:to_f)
       bar_areas = rect.hsplit(*Array.new(y_values.size){1})
       f = lambda{|v, rc|
-        (v-yrange[0]) * rc.h / (yrange[1]-yrange[0]) + rc.bottom
+        abs_y_positoin( v, rc, yrange)
       }
       y_values.zip(bar_areas, @opts[:colors]).each do |v, rc, col|
         draw_bar(pdf, rc, [f[v,rc], f[0,rc]], col)
@@ -129,7 +133,29 @@ module Charma
       draw_samesize_texts( pdf, rects, @opts[:x_ticks], valign: :top )
     end
 
-    def render_yticks(pdf, area)
+    def tick_unit(v)
+      base = (10**Math.log10(v).round).to_f
+      man = v/base
+      return 0.5*base if man<0.7
+      return base if man<1.5
+      base*2
+    end
+
+    def render_yticks(pdf, area, yrange)
+      f = lambda{|v, rc|
+        abs_y_positoin( v, rc, yrange)
+      }
+      unit = tick_unit((yrange.max - yrange.min) * 0.1)
+      i_low = (yrange.min / unit).ceil
+      i_hi = (yrange.max / unit).floor
+      values = (i_low..i_hi).map{ |i| i*unit }
+      h = (area.h / values.size) * 0.7
+      rects = values.map{ |v|
+        abs_y = abs_y_positoin( v, area, yrange )
+        Rect.new( area.x, abs_y + h/2, area.w*0.9, h )
+      }
+      svalues = values.map{ |v| "%g " % v }
+      draw_samesize_texts( pdf, rects, svalues, align: :right )
     end
 
     def render( pdf, rect )
@@ -142,7 +168,7 @@ module Charma
         1 )
       draw_text( pdf, title, title_text ) if title_text
       hratio = [1,10]
-      ytick, chart = main.hsplit(*hratio)
+      yticks, chart = main.hsplit(*hratio)
       ymin = [0, @opts[:y_values].min * 1.1].min
       ymax = [0, @opts[:y_values].max * 1.1].max
       yrange = [ymin, ymax]
@@ -151,7 +177,7 @@ module Charma
         _, xticks = ticks.hsplit(*hratio)
         render_xticks(pdf, xticks)
       end
-      #render_yticks(pdf, yticks, yrange)
+      render_yticks(pdf, yticks, yrange)
     end
   end
 
@@ -191,7 +217,6 @@ module Charma
     end
 
     def new_page(&block)
-      p @pages
       page = Page.new(self)
       block[page]
       @pages.push page
