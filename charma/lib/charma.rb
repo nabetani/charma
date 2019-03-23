@@ -27,6 +27,15 @@ module Charma
       }
     end
 
+    def center
+      [x+w/2, y-h/2]
+    end
+
+    def rot90
+      cx, cy = center
+      Rect.new( cx-h/2, cy+w/2, h, w )
+    end
+
     def right
       x+w
     end
@@ -37,6 +46,10 @@ module Charma
 
     def topleft
       [x,y]
+    end
+
+    def bottomleft
+      [x, y-h]
     end
   end
 
@@ -94,6 +107,16 @@ module Charma
         texts.zip(rects).each do |txt, rc|
           draw_text( pdf, rc, txt, size:size, **opts )
         end
+      end
+    end
+
+    def render_rottext( pdf, rect, text )
+      pdf.rotate(90, origin: rect.center) do
+        rc = rect.rot90
+        w = pdf.width_of(text, size:1)
+        h = pdf.height_of(text, size:1)
+        size = [rc.w.to_f/w ,rc.h.to_f/h].min
+        pdf.draw_text( text, size:size, at:rc.bottomleft )
       end
     end
   end
@@ -187,14 +210,17 @@ module Charma
         (@opts[:x_ticks] ? 0.5 : 0),
         1 )
       draw_text( pdf, title, title_text ) if title_text
-      hratio = [1,10]
-      yticks, chart = main.hsplit(*hratio)
+      hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
+      ylabel, yticks, chart = main.hsplit(*hratio)
       ymin = [0, @opts[:y_values].min * 1.1].min
       ymax = [0, @opts[:y_values].max * 1.1].max
       yrange = [ymin, ymax]
       render_chart(pdf, chart, yrange)
+      if @opts[:y_label]
+        render_rottext(pdf, ylabel, @opts[:y_label] )
+      end
       if @opts[:x_ticks]
-        _, xticks = ticks.hsplit(*hratio)
+        _, _, xticks = ticks.hsplit(*hratio)
         render_xticks(pdf, xticks)
       end
       yvalues = ytick_values(yrange)
