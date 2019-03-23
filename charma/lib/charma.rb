@@ -16,6 +16,17 @@ module Charma
       }
     end
 
+    def hsplit( *rel_ws )
+      rel_sum = rel_ws.sum
+      abs_x = x.to_f
+      rel_ws.map{ |rel_w|
+        abs_w = rel_w.to_f * w / rel_sum
+        rc = Rect.new( abs_x, y, abs_w, h )
+        abs_x += abs_w
+        rc
+      }
+    end
+
     def topleft
       [x,y]
     end
@@ -33,7 +44,8 @@ module Charma
         at:rect.topleft,
         width:rect.w,
         height:rect.h,
-        align: (opts[:center] || :center),
+        align: (opts[:align] || :center),
+        valign: (opts[:valign] || :center),
         size: rect.h,
         overflow: :shrink_to_fit )
     end
@@ -44,13 +56,17 @@ module Charma
       @opts = opts
     end
 
+    def render_chart(pdf, rect)
+      stroke_rect(pdf, rect)
+    end
+
     def render( pdf, rect )
       stroke_rect(pdf, rect)
-      areas = rect.vsplit( 1, 7, 0.5, 1 )
-      areas.each do |a|
-        stroke_rect( pdf, a )
-      end
-      draw_text( pdf, areas[0], "title" )
+      title, main, tick, bottom = rect.vsplit( 1, 7, 0.5, 1 )
+      draw_text( pdf, title, "title" )
+      hratio = [1,10]
+      ytick, chart = main.hsplit(*hratio)
+      render_chart(pdf, chart)
     end
   end
 
