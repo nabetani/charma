@@ -45,7 +45,6 @@ module Charma
     end
 
     def draw_samesize_texts( pdf, rects, texts, opts={} )
-      inf = 1e100
       pdf.save_graphics_state do
         size = texts.zip(rects).map{ |txt,rc|
           w = pdf.width_of(txt, size:1)

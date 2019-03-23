@@ -25,7 +25,7 @@ module Charma
       stroke_rect(pdf, rect)
       y_values = @opts[:y_values].map(&:to_f)
       bar_areas = rect.hsplit(*Array.new(y_values.size){1})
-      f = lambda{|v, rc|
+      f = lambda{ |v, rc|
         abs_y_positoin( v, rc, yrange)
       }
       y_values.zip(bar_areas, @opts[:colors]).each do |v, rc, col|
