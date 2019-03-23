@@ -87,10 +87,11 @@ module Charma
     end
 
     def draw_bar(pdf, rect, y, col)
+      ratio = 0.75
       bar = Rect.new(
-        rect.x + rect.w*0.25,
+        rect.x + rect.w*(1-ratio)/2,
         y.max,
-        rect.w*0.5,
+        rect.w*ratio,
         y.max - y.min )
       fill_rect( pdf, bar, col )
     end
