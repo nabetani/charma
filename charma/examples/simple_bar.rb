@@ -34,7 +34,7 @@ Charma::Document.new{ |doc|
     ],
     Array.new(11){ |n|
       {
-        y_values: Array.new(7){ rand+rand-rand },
+        y_values: ->{ m=rand+0.1; Array.new(7){ m*(rand+rand-rand) } }[],
         title:"graph #{n}",
       }
     }
