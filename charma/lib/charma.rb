@@ -5,8 +5,17 @@ module Charma
   class Error < StandardError; end
 
   Rect = Struct.new( :x, :y, :w, :h ) do
+    def vsplit( *rel_hs )
+      rel_sum = rel_hs.sum
+      abs_y = y.to_f
+      rel_hs.map{ |rel_h|
+        abs_h = rel_h.to_f * h / rel_sum
+        rc = Rect.new( x, abs_y, w, abs_h )
+        abs_y -= abs_h
+        rc
+      }
+    end
   end
-
 
   class Chart
     def stroke_rect( pdf, rect )
@@ -23,6 +32,10 @@ module Charma
 
     def render( pdf, rect )
       stroke_rect(pdf, rect)
+      areas = rect.vsplit( 1, 7, 0.5, 1 )
+      areas.each do |a|
+        stroke_rect( pdf, a )
+      end
     end
   end
 
