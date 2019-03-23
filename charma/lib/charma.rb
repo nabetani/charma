@@ -75,7 +75,7 @@ module Charma
         when 1..2 then 2-t
         else 0
         end
-        "%02x" % (v*255).round
+        "%02x" % (v**0.5*255).round
       }
       Array.new(n){ |i|
         t = i*3.0/n
