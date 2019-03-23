@@ -214,7 +214,7 @@ module Charma
       ylabel, yticks, chart = main.hsplit(*hratio)
       ymin = [0, @opts[:y_values].min * 1.1].min
       ymax = [0, @opts[:y_values].max * 1.1].max
-      yrange = [ymin, ymax]
+      yrange = @opts[:y_range] || [ymin, ymax]
       render_chart(pdf, chart, yrange)
       if @opts[:y_label]
         render_rottext(pdf, ylabel, @opts[:y_label] )
