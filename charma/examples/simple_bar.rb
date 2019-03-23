@@ -19,7 +19,8 @@ Charma::Document.new{ |doc|
     },
     {
       y_values: [7e+06, 2.8e+07, 1.2e+07, 1.5e+07, 2.7e+07, 2.5e+07, 1.3e+07],
-      x_ticks:%w(Alcyone Atlas Electra Maia Merope Taygeta Pleione),
+      x_ticks: %w(Alcyone Atlas Electra Maia Merope Taygeta Pleione),
+      y_label: "Random Number",
     },
   ].each do |opts|
     doc.new_page do |page|
