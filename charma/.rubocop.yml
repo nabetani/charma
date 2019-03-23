@@ -63,3 +63,9 @@ Style/FormatString:
 
 Layout/SpaceAfterNot:
   Enabled: false
+
+Layout/AlignHash:
+  Enabled: false
+
+Layout/AlignParameters:
+  Enabled: false
