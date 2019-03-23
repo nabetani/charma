@@ -108,18 +108,32 @@ module Charma
       end
     end
 
+    def render_xticks(pdf, area)
+      xt = @opts[:x_ticks]
+      xt.zip( area.hsplit(*Array.new(xt.size){ 1 }) ).each do |txt, rc0|
+        _,rc, = rc0.hsplit(1,3,1)
+        draw_text( pdf, rc, txt, valign: :top )
+      end
+    end
+
     def render( pdf, rect )
       stroke_rect(pdf, rect)
-
       title_text = @opts[:title]
-
-      title, main, tick, bottom = rect.vsplit( (title_text ? 1 : 0), 7, 0.5, 1 )
+      title, main, ticks, bottom = rect.vsplit(
+        (title_text ? 1 : 0), 
+        7, 
+        (@opts[:x_ticks] ? 0.5 : 0),
+        1 )
       draw_text( pdf, title, title_text ) if title_text
-        hratio = [1,10]
+      hratio = [1,10]
       ytick, chart = main.hsplit(*hratio)
       ymin = [0, @opts[:y_values].min * 1.1].min
       ymax = [0, @opts[:y_values].max * 1.1].max
       render_chart(pdf, chart, [ymin, ymax])
+      if @opts[:x_ticks]
+        _, xticks = ticks.hsplit(*hratio)
+        render_xticks(pdf, xticks)
+      end
     end
   end
 
