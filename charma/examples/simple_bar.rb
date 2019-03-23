@@ -7,6 +7,7 @@ Charma::Document.new{ |doc|
     {
       y_values: [3,1,4,1,5],
       title: "Lorem ipsum",
+      x_ticks: %w(foo bar baz qux quux),
     },
     {
       y_values: [9,2,6,5,4,5,8,9,7,9],
@@ -14,6 +15,7 @@ Charma::Document.new{ |doc|
     {
       y_values: [76, -28, -67, 155, 77, 160, 61, 48, -63, 26],
       title: "Excepteur sint occaecat cupidatat non proident",
+      x_ticks:%w(foo bar baz qux quux corge grault garply waldo fred),
     }
   ].each do |opts|
     doc.new_page do |page|
