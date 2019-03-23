@@ -46,5 +46,9 @@ module Charma
     def add_barchart(opts)
       @graphs.push BarChart.new(opts)
     end
+
+    def add_linechart(opts)
+      @graphs.push LineChart.new(opts)
+    end
   end
 end
