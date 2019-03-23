@@ -27,6 +27,10 @@ module Charma
       }
     end
 
+    def right
+      x+w
+    end
+
     def bottom
       y-h
     end
@@ -141,14 +145,14 @@ module Charma
       base*2
     end
 
-    def render_yticks(pdf, area, yrange)
-      f = lambda{|v, rc|
-        abs_y_positoin( v, rc, yrange)
-      }
+    def ytick_values(yrange)
       unit = tick_unit((yrange.max - yrange.min) * 0.1)
       i_low = (yrange.min / unit).ceil
       i_hi = (yrange.max / unit).floor
-      values = (i_low..i_hi).map{ |i| i*unit }
+      (i_low..i_hi).map{ |i| i*unit }
+    end
+
+    def render_yticks(pdf, area, yrange, values)
       h = (area.h / values.size) * 0.7
       rects = values.map{ |v|
         abs_y = abs_y_positoin( v, area, yrange )
@@ -156,6 +160,22 @@ module Charma
       }
       svalues = values.map{ |v| "%g " % v }
       draw_samesize_texts( pdf, rects, svalues, align: :right )
+    end
+
+    def render_y_grid(pdf, area, yrange, values)
+      pdf.save_graphics_state do
+        values.each do |v|
+          if v==0
+            pdf.stroke_color "000000"
+            pdf.undash
+          else
+            pdf.stroke_color "888888"
+            pdf.dash([2,2])
+          end
+          abs_y = abs_y_positoin( v, area, yrange )
+          pdf.stroke_horizontal_line area.x, area.right, at: abs_y
+        end
+      end
     end
 
     def render( pdf, rect )
@@ -177,7 +197,9 @@ module Charma
         _, xticks = ticks.hsplit(*hratio)
         render_xticks(pdf, xticks)
       end
-      render_yticks(pdf, yticks, yrange)
+      yvalues = ytick_values(yrange)
+      render_yticks(pdf, yticks, yrange, yvalues)
+      render_y_grid(pdf, chart, yrange, yvalues)
     end
   end
 
