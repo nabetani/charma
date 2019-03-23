@@ -109,9 +109,12 @@ module Charma
 
     def render( pdf, rect )
       stroke_rect(pdf, rect)
-      title, main, tick, bottom = rect.vsplit( 1, 7, 0.5, 1 )
-      draw_text( pdf, title, "title" )
-      hratio = [1,10]
+
+      title_text = @opts[:title]
+
+      title, main, tick, bottom = rect.vsplit( (title_text ? 1 : 0), 7, 0.5, 1 )
+      draw_text( pdf, title, title_text ) if title_text
+        hratio = [1,10]
       ytick, chart = main.hsplit(*hratio)
       ymin = [0, @opts[:y_values].min * 1.1].min
       ymax = [0, @opts[:y_values].max * 1.1].max
