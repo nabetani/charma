@@ -27,6 +27,10 @@ module Charma
       }
     end
 
+    def bottom
+      y-h
+    end
+
     def topleft
       [x,y]
     end
@@ -56,8 +60,25 @@ module Charma
       @opts = opts
     end
 
-    def render_chart(pdf, rect)
+    def draw_bar(pdf, rect, y)
+      bar = Rect.new(
+        rect.x + rect.w*0.25,
+        y.max,
+        rect.w*0.5,
+        y.max - y.min )
+      stroke_rect( pdf, bar )
+    end
+
+    def render_chart(pdf, rect, yrange)
       stroke_rect(pdf, rect)
+      y_values = @opts[:y_values].map(&:to_f)
+      bar_areas = rect.hsplit(*Array.new(y_values.size){1})
+      f = ->(v,rc){
+        (v-yrange[0]) * rc.h / (yrange[1]-yrange[0]) + rc.bottom
+      }
+      y_values.zip(bar_areas).each do |v, rc|
+        draw_bar(pdf, rc, [f[v,rc], f[0,rc]])
+      end
     end
 
     def render( pdf, rect )
@@ -66,7 +87,9 @@ module Charma
       draw_text( pdf, title, "title" )
       hratio = [1,10]
       ytick, chart = main.hsplit(*hratio)
-      render_chart(pdf, chart)
+      ymin = [0, @opts[:y_values].min * 1.1].min
+      ymax = [0, @opts[:y_values].max * 1.1].max
+      render_chart(pdf, chart, [ymin, ymax])
     end
   end
 
