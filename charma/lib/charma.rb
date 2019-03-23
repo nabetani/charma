@@ -124,7 +124,7 @@ module Charma
   class BarChart < Chart
     def initialize(opts)
       @opts = opts
-      @opts[:colors] ||= colors(opts[:y_values].size)
+      @opts[:colors] ||= colors(@opts[:y_values].size)
     end
 
     def draw_bar(pdf, rect, y, col)
