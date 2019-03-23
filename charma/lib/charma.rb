@@ -5,14 +5,15 @@ module Charma
   class Error < StandardError; end
 
   Rect = Struct.new( :x, :y, :w, :h ) do
-    def stroke(pdf)
-      pdf.stroke{
-        pdf.rectangle( [x, y], w, h )
-      }
-    end
   end
 
+
   class Chart
+    def stroke_rect( pdf, rect )
+      pdf.stroke{
+        pdf.rectangle( [rect.x, rect.y], rect.w, rect.h )
+      }
+    end
   end
 
   class BarChart < Chart
@@ -21,7 +22,7 @@ module Charma
     end
 
     def render( pdf, rect )
-      rect.stroke(pdf)
+      stroke_rect(pdf, rect)
     end
   end
 
