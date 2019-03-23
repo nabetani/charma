@@ -43,7 +43,16 @@ module Charma
       }
     end
 
-    def draw_text( pdf, rect, text, opts={} )
+    def fill_rect( pdf, rect, col )
+      pdf.save_graphics_state do
+        pdf.fill{
+          pdf.fill_color( col )
+          pdf.rectangle( [rect.x, rect.y], rect.w, rect.h )
+        }
+      end
+    end
+
+    def draw_text( pdf, rect, text, opts = {} )
       pdf.text_box( text,
         at:rect.topleft,
         width:rect.w,
@@ -53,31 +62,48 @@ module Charma
         size: rect.h,
         overflow: :shrink_to_fit )
     end
+
+    def colors(n)
+      f = ->(t0){
+        t = t0 % 3
+        v = case t
+        when 0..1 then t
+        when 1..2 then 2-t
+        else 0
+        end
+        "%02x" % (v*255).round
+      }
+      Array.new(n){ |i|
+        t = i*3.0/n
+        [f[t],f[t+1],f[t+2]].join
+      }
+    end
   end
 
   class BarChart < Chart
     def initialize(opts)
       @opts = opts
+      @opts[:colors] ||= colors(opts[:y_values].size)
     end
 
-    def draw_bar(pdf, rect, y)
+    def draw_bar(pdf, rect, y, col)
       bar = Rect.new(
         rect.x + rect.w*0.25,
         y.max,
         rect.w*0.5,
         y.max - y.min )
-      stroke_rect( pdf, bar )
+      fill_rect( pdf, bar, col )
     end
 
     def render_chart(pdf, rect, yrange)
       stroke_rect(pdf, rect)
       y_values = @opts[:y_values].map(&:to_f)
       bar_areas = rect.hsplit(*Array.new(y_values.size){1})
-      f = ->(v,rc){
+      f = lambda{|v, rc|
         (v-yrange[0]) * rc.h / (yrange[1]-yrange[0]) + rc.bottom
       }
-      y_values.zip(bar_areas).each do |v, rc|
-        draw_bar(pdf, rc, [f[v,rc], f[0,rc]])
+      y_values.zip(bar_areas, @opts[:colors]).each do |v, rc, col|
+        draw_bar(pdf, rc, [f[v,rc], f[0,rc]], col)
       end
     end
 
