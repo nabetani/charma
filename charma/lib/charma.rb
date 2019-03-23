@@ -15,6 +15,10 @@ module Charma
         rc
       }
     end
+
+    def topleft
+      [x,y]
+    end
   end
 
   class Chart
@@ -22,6 +26,16 @@ module Charma
       pdf.stroke{
         pdf.rectangle( [rect.x, rect.y], rect.w, rect.h )
       }
+    end
+
+    def draw_text( pdf, rect, text, opts={} )
+      pdf.text_box( text,
+        at:rect.topleft,
+        width:rect.w,
+        height:rect.h,
+        align: (opts[:center] || :center),
+        size: rect.h,
+        overflow: :shrink_to_fit )
     end
   end
 
@@ -36,6 +50,7 @@ module Charma
       areas.each do |a|
         stroke_rect( pdf, a )
       end
+      draw_text( pdf, areas[0], "title" )
     end
   end
 
