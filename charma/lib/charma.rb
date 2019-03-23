@@ -59,7 +59,7 @@ module Charma
         height:rect.h,
         align: (opts[:align] || :center),
         valign: (opts[:valign] || :center),
-        size: rect.h,
+        size: (opts[:size] || rect.h),
         overflow: :shrink_to_fit )
     end
 
@@ -109,10 +109,21 @@ module Charma
     end
 
     def render_xticks(pdf, area)
-      xt = @opts[:x_ticks]
-      xt.zip( area.hsplit(*Array.new(xt.size){ 1 }) ).each do |txt, rc0|
-        _,rc, = rc0.hsplit(1,3,1)
-        draw_text( pdf, rc, txt, valign: :top )
+      pdf.save_graphics_state do
+        xt = @opts[:x_ticks]
+        w, h = xt.inject( [0,0] ) do |acc,txt|
+          [
+            [acc[0], pdf.width_of(txt, size:1)].max,
+            [acc[1], pdf.height_of(txt, size:1)].max
+          ]
+        end
+        rects = area.hsplit(*Array.new(xt.size){ 1 }).map{ |rc0|
+          rc0.hsplit(1,8,1)[1]
+        }
+        size = [rects[0].w/w, rects[0].h/h].min
+        xt.zip(rects).each do |txt, rc|
+          draw_text( pdf, rc, txt, valign: :top, size:size )
+        end
       end
     end
 
