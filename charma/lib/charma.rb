@@ -205,11 +205,10 @@ module Charma
     def render( pdf, rect )
       stroke_rect(pdf, rect)
       title_text = @opts[:title]
-      title, main, ticks, bottom = rect.vsplit(
+      title, main, ticks = rect.vsplit(
         (title_text ? 1 : 0),
         7, 
-        (@opts[:x_ticks] ? 0.5 : 0),
-        1 )
+        (@opts[:x_ticks] ? 0.5 : 0))
       draw_text( pdf, title, title_text ) if title_text
       hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
       ylabel, yticks, chart = main.hsplit(*hratio)
