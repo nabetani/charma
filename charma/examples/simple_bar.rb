@@ -6,9 +6,18 @@ Charma::Document.new{ |doc|
   [
     {
       series: [
-        {y: [3,1,4,1,5]},
-        {y: [1,4,1,4,2]},
-        {y: [2,2,3,6,2]},
+        {
+          name: "pi",
+          y: [3,1,4,1,5]
+        },
+        {
+          name: "sqrt(2)",
+          y: [1,4,1,4,2]
+        },
+        {
+          name: "sqrt(5)",
+          y: [2,2,3,6,2]
+        },
       ],
       title: "Lorem ipsum",
       x_ticks: %w(foo bar baz qux quux),
