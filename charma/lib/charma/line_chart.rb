@@ -59,7 +59,7 @@ module Charma
       draw_text( pdf, title, title_text ) if title_text
       hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
       ylabel, yticks, chart = main.hsplit(*hratio)
-      xrange = @opts[:y_range] || calc_range(:x)
+      xrange = @opts[:x_range] || calc_range(:x)
       yrange = @opts[:y_range] || calc_range(:y)
       render_chart(pdf, chart, xrange, yrange)
       # if @opts[:y_label]
