@@ -7,14 +7,14 @@ module Charma
     end
 
     def scaled_values(sym)
-      if @opts[:series].first[sym]
-        @opts[:series].map{ |e|
+      @opts[:series].map{ |e|
+        v = e[sym]
+        if v
           e[sym].map{ |v| scale_value(sym, v) }
-        }
-      else
-        ticks = @opts[:"#{sym}_ticks"]
-        [*1..ticks.size] * @opts[:series].size
-      end
+        else
+          (1..e[:y].size).map(&:to_f)
+        end
+      }
     end
 
     def calc_range( sym )
@@ -31,11 +31,7 @@ module Charma
     end
 
     def render_series( pdf, rect, xrange, yrange, s)
-      xs = s[:x]
-      unless xs
-        ticks = @opts[:x_ticks]
-        xs = (1..ticks.size).map(&:to_f)
-      end
+      xs = s[:x] || [*1..s[:y].size]
       ys = s[:y]
       points = xs.zip(ys).map{ |x,y|
         [
@@ -65,7 +61,7 @@ module Charma
 
     def has_x_ticks?
       if @opts[:x_ticks].nil?
-        true
+        !! @opts[:series].first[:x]
       else
         !! @opts[:x_ticks]
       end
@@ -99,10 +95,10 @@ module Charma
     end
 
     def tick_values(axis, range)
-      if @opts[:series].first[axis]
+      ticks = @opts[:"#{axis}_ticks"]
+      if @opts[:series].first[axis] || !ticks
         super(axis, range)
       else
-        ticks = @opts[:"#{axis}_ticks"]
         (1..ticks.size).map(&:to_f)
       end
     end
