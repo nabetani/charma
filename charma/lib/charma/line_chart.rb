@@ -56,8 +56,7 @@ module Charma
       end
     end
 
-    def render_xticks(pdf, area, xrange)
-      xticks = tick_values( xrange )
+    def render_xticks(pdf, area, xrange, xticks)
       xtick_texts = xticks.map{ |e| "%g" % e }
       w = area.w*0.7 / xticks.size
       rects = xticks.map{ |rx|
@@ -65,6 +64,23 @@ module Charma
         Rect.new( ax-w/2, area.y, w, area.h )
       }
       draw_samesize_texts( pdf, rects, xtick_texts, valign: :top )
+    end
+
+    def render_x_grid(pdf, area, xrange, xvalues)
+      pdf.save_graphics_state do
+        pdf.line_width = 0.5
+        xvalues.each do |v|
+          if v==0
+            pdf.stroke_color "000000"
+            pdf.undash
+          else
+            pdf.stroke_color "888888"
+            pdf.dash([2,2])
+          end
+          abs_x = abs_x_positoin( v, area, xrange )
+          pdf.stroke_vertical_line area.y, area.bottom, at: abs_x
+        end
+      end
     end
 
     def render( pdf, rect )
@@ -81,10 +97,12 @@ module Charma
       xrange = @opts[:x_range] || calc_range(:x)
       yrange = @opts[:y_range] || calc_range(:y)
       render_chart(pdf, chart, xrange, yrange)
+      xvalues = tick_values( xrange )
       if has_x_ticks?
         _, _, xticks = ticks.hsplit(*hratio)
-        render_xticks(pdf, xticks, xrange)
+        render_xticks(pdf, xticks, xrange, xvalues)
       end
+      render_x_grid(pdf, chart, xrange, xvalues)
       
       render_legend(pdf, bottom) if bottom_legend?
       yvalues = tick_values(yrange)
