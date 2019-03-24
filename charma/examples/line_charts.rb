@@ -18,6 +18,22 @@ Charma::Document.new{ |doc|
         }
       ],
     },
+    {
+      title: "Semi-log graph",
+      y_scale: :log10,
+      series:[
+        {
+          x: [*1..10],
+          y: (1..10).map{ |x| 10.0**x },
+          name: "10.0**x"
+        },
+        {
+          x: [*1..10],
+          y: (1..10).map{ |e| 2**(1.41**e) },
+          name: "2**(1.41**e)"
+        },
+      ]
+    }
   ].each do |opts|
     doc.new_page do |page|
       case opts
