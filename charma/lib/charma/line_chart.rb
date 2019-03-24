@@ -87,8 +87,9 @@ module Charma
       end
       
       render_legend(pdf, bottom) if bottom_legend?
-      # if @opts[:y_label]
-      #   render_rottext(pdf, ylabel, @opts[:y_label] )
+      yvalues = tick_values(yrange)
+      render_yticks(pdf, yticks, yrange, yvalues)
+        
       # end
       # if @opts[:x_ticks]
       #   _, _, xticks = ticks.hsplit(*hratio)

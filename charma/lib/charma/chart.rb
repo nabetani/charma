@@ -126,5 +126,15 @@ module Charma
       (i_low..i_hi).map{ |i| i*unit }
     end
 
+    def render_yticks(pdf, area, yrange, yvalues)
+      h = (area.h / yvalues.size) * 0.7
+      rects = yvalues.map{ |v|
+        abs_y = abs_y_positoin( v, area, yrange )
+        Rect.new( area.x, abs_y + h/2, area.w*0.9, h )
+      }
+      svalues = yvalues.map{ |v| "%g " % v }
+      draw_samesize_texts( pdf, rects, svalues, align: :right )
+    end
+
   end
 end
