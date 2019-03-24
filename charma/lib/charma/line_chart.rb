@@ -48,13 +48,29 @@ module Charma
       end
     end
 
+    def has_x_ticks?
+      if @opts[:x_ticks].nil?
+        true
+      else
+        !! @opts[:x_ticks]
+      end
+    end
+
+    def render_xticks(pdf, area, xrange)
+      xtick_texts = tick_values( xrange ).map{ |e| "%g" % e }
+      rects = area.hsplit(*([1]*xtick_texts.size)).map{ |rc0|
+        rc0.hsplit(1,8,1)[1]
+      }
+      draw_samesize_texts( pdf, rects, xtick_texts, valign: :top )
+    end
+
     def render( pdf, rect )
       stroke_rect(pdf, rect)
       title_text = @opts[:title]
       title, main, ticks, bottom = rect.vsplit(
         (title_text ? 1 : 0),
         7, 
-        (@opts[:x_ticks] ? 0.5 : 0),
+        (has_x_ticks? ? 0.5 : 0),
         (bottom_legend? ? 0.5 : 0))
       draw_text( pdf, title, title_text ) if title_text
       hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
@@ -62,6 +78,11 @@ module Charma
       xrange = @opts[:x_range] || calc_range(:x)
       yrange = @opts[:y_range] || calc_range(:y)
       render_chart(pdf, chart, xrange, yrange)
+      if has_x_ticks?
+        _, _, xticks = ticks.hsplit(*hratio)
+        render_xticks(pdf, xticks, xrange)
+      end
+      
       render_legend(pdf, bottom) if bottom_legend?
       # if @opts[:y_label]
       #   render_rottext(pdf, ylabel, @opts[:y_label] )

@@ -110,5 +110,21 @@ module Charma
         fill_rect( pdf, rc, col )
       end
     end
+
+    def tick_unit(v)
+      base = (10**Math.log10(v).round).to_f
+      man = v/base
+      return 0.5*base if man<0.6
+      return base if man<1.2
+      base*2
+    end
+
+    def tick_values(range)
+      unit = tick_unit((range.max - range.min) * 0.1)
+      i_low = (range.min / unit).ceil
+      i_hi = (range.max / unit).floor
+      (i_low..i_hi).map{ |i| i*unit }
+    end
+
   end
 end
