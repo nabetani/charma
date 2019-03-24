@@ -38,8 +38,8 @@ module Charma
         hist.each.with_index do |f, ix|
           w = rc.w * f
           top = rc.bottom + h*(ix+1)
-          #stroke_rect( pdf, Rect.new( cx-w/2, top, w, h ))
-          fill_rect( pdf, Rect.new( cx-w/2, top, w, h ), col )
+          edge = 1e-1 # バーの隙間を埋める
+          fill_rect( pdf, Rect.new( cx-w/2, top + edge, w, h + edge*2 ), col )
         end
       end
     end
