@@ -2,7 +2,7 @@
 
 require 'charma'
 
-Charma::Document.new{ |doc|
+Charma::Document.new do |doc|
   [
     {
       title: "Lorem ipsum",
@@ -103,4 +103,5 @@ Charma::Document.new{ |doc|
       end
     end
   end
-}.render( File.basename(__FILE__, ".*")+".pdf" )
+  doc.render( File.basename(__FILE__, ".*")+".pdf" )
+end

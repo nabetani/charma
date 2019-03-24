@@ -20,7 +20,7 @@ foobar = SampleMaker.new(20000)
 
 small = SampleMaker.new(6)
 
-Charma::Document.new{ |doc|
+Charma::Document.new do |doc|
   [
     {
       title: "Lorem ipsum",
@@ -62,4 +62,5 @@ Charma::Document.new{ |doc|
       end
     end
   end
-}.render( File.basename(__FILE__, ".*")+".pdf" )
+  doc.render( File.basename(__FILE__, ".*")+".pdf" )
+end
