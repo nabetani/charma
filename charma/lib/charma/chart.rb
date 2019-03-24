@@ -2,6 +2,10 @@
 
 module Charma
   class Chart
+    def initialize(opts)
+      @opts = opts
+    end
+
     def stroke_rect( pdf, rect )
       pdf.stroke{
         pdf.rectangle( [rect.x, rect.y], rect.w, rect.h )

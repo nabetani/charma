@@ -3,7 +3,7 @@
 module Charma
   class BarChart < Chart
     def initialize(opts)
-      @opts = opts
+      super(opts)
     end
 
     def draw_bar(pdf, rect, yrange, ys, cols)

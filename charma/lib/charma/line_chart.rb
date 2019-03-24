@@ -3,8 +3,7 @@
 module Charma
   class LineChart < Chart
     def initialize(opts)
-      @opts = opts
-      @opts[:colors] ||= colors(@opts[:series].size)
+      super(opts)
     end
 
     def calc_range( sym )
@@ -39,15 +38,15 @@ module Charma
 
     def render_chart(pdf, rect, xrange, yrange)
       stroke_rect(pdf, rect)
+      cols = colors(@opts[:series].size)
       pdf.save_graphics_state do
         pdf.line_width( 4 )
-        @opts[:series].each.with_index do |s,ix|
-          pdf.stroke_color( @opts[:colors][ix] )
+        @opts[:series].zip(cols).each do |s, col|
+          pdf.stroke_color( col )
           render_series( pdf, rect, xrange, yrange, s)
         end
       end
     end
-
 
     def render( pdf, rect )
       stroke_rect(pdf, rect)
