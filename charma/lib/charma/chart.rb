@@ -26,10 +26,6 @@ module Charma
       @opts[:series].any?{ |s| ! s[:name].nil? }
     end
 
-    def abs_x_positoin(v, rc, xrange)
-      (v-xrange[0]) * rc.w / (xrange[1]-xrange[0]) + rc.x
-    end
-
     def scale_type(sym)
       key = :"#{sym}_scale"
       case @opts[key]
@@ -56,6 +52,11 @@ module Charma
       else
         v
       end
+    end
+
+    def abs_x_positoin(v, rc, xrange)
+      rx, min, max = [ v, *xrange ].map{ |e| scale_value(:x, e) }
+      (rx-min) * rc.w / (max-min) + rc.x
     end
 
     def abs_y_positoin(v, rc, yrange)
