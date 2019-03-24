@@ -39,6 +39,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2.0)
   charma!
+  prawn (~> 2.2.2)
   pry
   rake (~> 10.0)
   rspec (~> 3.0)
