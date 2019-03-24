@@ -72,5 +72,6 @@ module Charma
       # yvalues = ytick_values(yrange)
       # render_yticks(pdf, yticks, yrange, yvalues)
       # render_y_grid(pdf, chart, yrange, yvalues)
-    end  end
+    end  
+  end
 end
