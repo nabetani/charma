@@ -21,8 +21,8 @@ module Charma
     end
 
     def render_series( pdf, rect, xrange, yrange, s)
-      xs = s[:x_values]
-      ys = s[:y_values]
+      xs = s[:x]
+      ys = s[:y]
       points = xs.zip(ys).map{ |x,y|
         [
           abs_x_positoin( x, rect, xrange ),
@@ -59,8 +59,8 @@ module Charma
       draw_text( pdf, title, title_text ) if title_text
       hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
       ylabel, yticks, chart = main.hsplit(*hratio)
-      xrange = @opts[:y_range] || calc_range(:x_values)
-      yrange = @opts[:y_range] || calc_range(:y_values)
+      xrange = @opts[:y_range] || calc_range(:x)
+      yrange = @opts[:y_range] || calc_range(:y)
       render_chart(pdf, chart, xrange, yrange)
       # if @opts[:y_label]
       #   render_rottext(pdf, ylabel, @opts[:y_label] )
