@@ -9,6 +9,7 @@ SampleMaker = Struct.new(:size) do
   end
 
   def samples(*peaks)
+    srand(0)
     Array.new(size){
       r + peaks.sample
     }
