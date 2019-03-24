@@ -38,9 +38,9 @@ module Charma
     end
 
     def render_chart(pdf, rect, xrange, yrange)
+      stroke_rect(pdf, rect)
       pdf.save_graphics_state do
         pdf.line_width( 4 )
-        stroke_rect(pdf, rect)
         @opts[:series].each.with_index do |s,ix|
           pdf.stroke_color( @opts[:colors][ix] )
           render_series( pdf, rect, xrange, yrange, s)
