@@ -8,6 +8,12 @@ module Charma
       }
     end
 
+    def values(sym)
+      @opts[:series].map{ |s|
+        s[sym].map(&:to_f)
+      }
+    end
+
     def abs_x_positoin(v, rc, xrange)
       (v-xrange[0]) * rc.w / (xrange[1]-xrange[0]) + rc.x
     end
@@ -37,19 +43,24 @@ module Charma
     end
 
     def colors(n)
-      f = ->(t0){
-        t = t0 % 3
-        v = case t
-        when 0..1 then t
-        when 1..2 then 2-t
-        else 0
-        end
-        "%02x" % (v**0.5*255).round
-      }
-      Array.new(n){ |i|
-        t = i*3.0/n+1
-        [f[t],f[t+1],f[t+2]].join
-      }
+      case n
+      when 0, 1
+        return ["666666"]
+      else
+        f = ->(t0){
+          t = t0 % 3
+          v = case t
+          when 0..1 then t
+          when 1..2 then 2-t
+          else 0
+          end
+          "%02x" % (v**0.5*255).round
+        }
+        Array.new(n){ |i|
+          t = i*3.0/n+0.5
+          [f[t],f[t+1],f[t+2]].join
+        }
+      end
     end
 
     def draw_samesize_texts( pdf, rects, texts, opts={} )

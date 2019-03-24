@@ -4,28 +4,27 @@ module Charma
   class BarChart < Chart
     def initialize(opts)
       @opts = opts
-      @opts[:colors] ||= colors(@opts[:y_values].size)
     end
 
-    def draw_bar(pdf, rect, y, col)
+    def draw_bar(pdf, rect, yrange, ys)
       ratio = 0.75
-      bar = Rect.new(
-        rect.x + rect.w*(1-ratio)/2,
-        y.max,
-        rect.w*ratio,
-        y.max - y.min )
-      fill_rect( pdf, bar, col )
+      _, bars, = rect.hsplit( (1-ratio)/2, ratio, (1-ratio)/2 )
+      bar_rects = bars.hsplit(*Array.new(ys.size,1))
+      bar_rects.zip(ys).each.with_index do |(bar, y), ix|
+        ay = abs_y_positoin(y, bar, yrange)
+        zero = abs_y_positoin(0, bar, yrange)
+        b, t = [ ay, zero ].minmax
+        rc = Rect.new( bar.x, t, bar.w, (t-b) )
+        fill_rect( pdf, rc, "666666" )
+      end
     end
 
     def render_chart(pdf, rect, yrange)
       stroke_rect(pdf, rect)
-      y_values = @opts[:y_values].map(&:to_f)
-      bar_areas = rect.hsplit(*Array.new(y_values.size){1})
-      f = lambda{ |v, rc|
-        abs_y_positoin( v, rc, yrange)
-      }
-      y_values.zip(bar_areas, @opts[:colors]).each do |v, rc, col|
-        draw_bar(pdf, rc, [f[v,rc], f[0,rc]], col)
+      y_values = values(:y).transpose
+      bar_areas = rect.hsplit(*Array.new(y_values.size,1))
+      y_values.zip(bar_areas).each do |ys, rc|
+        draw_bar(pdf, rc, yrange, ys)
       end
     end
 
@@ -51,20 +50,20 @@ module Charma
       (i_low..i_hi).map{ |i| i*unit }
     end
 
-    def render_yticks(pdf, area, yrange, values)
-      h = (area.h / values.size) * 0.7
-      rects = values.map{ |v|
+    def render_yticks(pdf, area, yrange, yvalues)
+      h = (area.h / yvalues.size) * 0.7
+      rects = yvalues.map{ |v|
         abs_y = abs_y_positoin( v, area, yrange )
         Rect.new( area.x, abs_y + h/2, area.w*0.9, h )
       }
-      svalues = values.map{ |v| "%g " % v }
+      svalues = yvalues.map{ |v| "%g " % v }
       draw_samesize_texts( pdf, rects, svalues, align: :right )
     end
 
-    def render_y_grid(pdf, area, yrange, values)
+    def render_y_grid(pdf, area, yrange, yvalues)
       pdf.save_graphics_state do
         pdf.line_width = 0.5
-        values.each do |v|
+        yvalues.each do |v|
           if v==0
             pdf.stroke_color "000000"
             pdf.undash
@@ -78,6 +77,12 @@ module Charma
       end
     end
 
+    def bar_range
+      ymin = [0, values(:y).flatten.min * 1.1].min
+      ymax = [0, values(:y).flatten.max * 1.1].max
+      [ ymin, ymax ]
+    end
+
     def render( pdf, rect )
       stroke_rect(pdf, rect)
       title_text = @opts[:title]
@@ -88,9 +93,7 @@ module Charma
       draw_text( pdf, title, title_text ) if title_text
       hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
       ylabel, yticks, chart = main.hsplit(*hratio)
-      ymin = [0, @opts[:y_values].min * 1.1].min
-      ymax = [0, @opts[:y_values].max * 1.1].max
-      yrange = @opts[:y_range] || [ymin, ymax]
+      yrange = @opts[:y_range] || bar_range
       render_chart(pdf, chart, yrange)
       if @opts[:y_label]
         render_rottext(pdf, ylabel, @opts[:y_label] )
