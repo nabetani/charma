@@ -8,15 +8,17 @@ module Charma
 
     def calc_range( sym )
       r0 = @opts[:series].flat_map{ |e|
-        e[sym]
+        e[sym].map{ |v| scale_value(sym, v) }
       }.minmax
       dist = r0[1] - r0[0]
       delta = dist==0 ? 1 : dist*0.1
-      if 0<=r0[0]
-        [[r0[0]-delta, 0].max, r0[1]+delta]
-      else
-        [r0[0]-delta, r0[1]+delta]
-      end
+      raw_range =
+        if 0<=r0[0]
+          [[r0[0]-delta, 0].max, r0[1]+delta]
+        else
+          [r0[0]-delta, r0[1]+delta]
+        end
+      raw_range.map{ |e| unscale_value( sym, e ) }
     end
 
     def render_series( pdf, rect, xrange, yrange, s)
@@ -97,7 +99,7 @@ module Charma
       xrange = @opts[:x_range] || calc_range(:x)
       yrange = @opts[:y_range] || calc_range(:y)
       render_chart(pdf, chart, xrange, yrange)
-      xvalues = tick_values( xrange )
+      xvalues = tick_values(:x, xrange )
       if has_x_ticks?
         _, _, xticks = ticks.hsplit(*hratio)
         render_xticks(pdf, xticks, xrange, xvalues)
@@ -105,7 +107,7 @@ module Charma
       render_x_grid(pdf, chart, xrange, xvalues)
       
       render_legend(pdf, bottom) if bottom_legend?
-      yvalues = tick_values(yrange)
+      yvalues = tick_values(:y, yrange)
       render_yticks(pdf, yticks, yrange, yvalues)
       render_y_grid(pdf, chart, yrange, yvalues)
         

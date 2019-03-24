@@ -66,7 +66,7 @@ module Charma
         _, _, xticks = ticks.hsplit(*hratio)
         render_xticks(pdf, xticks)
       end
-      yvalues = tick_values(yrange)
+      yvalues = tick_values(:y, yrange)
       render_yticks(pdf, yticks, yrange, yvalues)
       render_y_grid(pdf, chart, yrange, yvalues)
       render_legend(pdf, bottom) if bottom_legend?

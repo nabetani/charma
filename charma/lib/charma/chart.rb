@@ -30,8 +30,37 @@ module Charma
       (v-xrange[0]) * rc.w / (xrange[1]-xrange[0]) + rc.x
     end
 
+    def scale_type(sym)
+      key = :"#{sym}_scale"
+      case @opts[key]
+      when :log10
+        :log10
+      else
+        :linear
+      end
+    end
+
+    def scale_value(axis, v)
+      case scale_type(axis)
+      when :log10
+        Math.log10(v)
+      else
+        v
+      end
+    end
+
+    def unscale_value(axis, v)
+      case scale_type(axis)
+      when :log10
+        10.0**v
+      else
+        v
+      end
+    end
+
     def abs_y_positoin(v, rc, yrange)
-      (v-yrange[0]) * rc.h / (yrange[1]-yrange[0]) + rc.bottom
+      ry, min, max = [ v, *yrange ].map{ |e| scale_value(:y, e) }
+      (ry-min) * rc.h / (max-min) + rc.bottom
     end
 
     def fill_rect( pdf, rect, col )
@@ -119,11 +148,12 @@ module Charma
       base*2
     end
 
-    def tick_values(range)
-      unit = tick_unit((range.max - range.min) * 0.1)
-      i_low = (range.min / unit).ceil
-      i_hi = (range.max / unit).floor
-      (i_low..i_hi).map{ |i| i*unit }
+    def tick_values(axis, range)
+      min, max = range.minmax.map{ |e| scale_value( axis, e ) }
+      unit = tick_unit((max - min) * 0.1)
+      i_low = (min / unit).ceil
+      i_hi = (max / unit).floor
+      (i_low..i_hi).map{ |i| unscale_value( axis, i*unit ) }
     end
 
     def render_yticks(pdf, area, yrange, yvalues)
