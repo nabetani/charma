@@ -78,6 +78,7 @@ module Charma
     end
 
     def render_chart(pdf, rect, yrange)
+      stroke_rect(pdf, rect)
       y_values = @opts[:series].map{ |s| s[:y] }.transpose
       bar_areas = rect.hsplit(*Array.new(y_values.size,1))
       cols = if y_values.first.size==1
