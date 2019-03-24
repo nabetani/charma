@@ -33,6 +33,23 @@ Charma::Document.new{ |doc|
           name: "2**(1.41**e)"
         },
       ]
+    },
+    {
+      title: "Log-log graph",
+      x_scale: :log10,
+      y_scale: :log10,
+      series:[
+        {
+          x: (1..10).map{ |t| 10.0**t },
+          y: (1..10).map{ |t| 10.0**t+1e7 },
+          name: "10.0**x+1e7"
+        },
+        {
+          x: (1..10).map{ |t| 10.0**t },
+          y: (1..10).map{ |t| 10.0**t*3 },
+          name: "10.0**t*3"
+        },
+      ]
     }
   ].each do |opts|
     doc.new_page do |page|
