@@ -64,6 +64,19 @@ Charma::Document.new{ |doc|
           name: "bar",
         },
       ]
+    },
+    {
+      title: "Y only",
+      series:[
+        {
+          y: Array.new(100){ |n| Math.sin(n*0.01*Math::PI*2) },
+          name: "sin",
+        },
+        {
+          y: Array.new(100){ |n| Math.cos(n*0.01*Math::PI*2) },
+          name: "cos",
+        },
+      ]
     }
   ].each do |opts|
     doc.new_page do |page|
