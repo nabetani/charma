@@ -77,6 +77,19 @@ Charma::Document.new{ |doc|
           name: "cos",
         },
       ]
+    },
+    Array.new(4){ |g|
+      {
+        title:" Graph No. #{g}",
+        series: Array.new(4){ |n|
+          len=100
+          r = Math::PI*2/len
+          {
+            name: "sin(t*#{g})+sin(t**0.5*#{n})",
+            y:Array.new(len){ |t| Math.sin(t*r*g)+Math.sin((t*r)**0.5*n) }
+          }
+        }
+      }
     }
   ].each do |opts|
     doc.new_page do |page|
