@@ -6,10 +6,19 @@ module Charma
       super(opts)
     end
 
+    def scaled_values(sym)
+      if @opts[:series].first[sym]
+        @opts[:series].map{ |e|
+          e[sym].map{ |v| scale_value(sym, v) }
+        }
+      else
+        ticks = @opts[:"#{sym}_ticks"]
+        [*1..ticks.size] * @opts[:series].size
+      end
+    end
+
     def calc_range( sym )
-      r0 = @opts[:series].flat_map{ |e|
-        e[sym].map{ |v| scale_value(sym, v) }
-      }.minmax
+      r0 = scaled_values(sym).flatten.minmax
       dist = r0[1] - r0[0]
       delta = dist==0 ? 1 : dist*0.1
       raw_range =
@@ -23,6 +32,10 @@ module Charma
 
     def render_series( pdf, rect, xrange, yrange, s)
       xs = s[:x]
+      unless xs
+        ticks = @opts[:x_ticks]
+        xs = (1..ticks.size).map(&:to_f)
+      end
       ys = s[:y]
       points = xs.zip(ys).map{ |x,y|
         [
@@ -59,7 +72,7 @@ module Charma
     end
 
     def render_xticks(pdf, area, xrange, xticks)
-      xtick_texts = xticks.map{ |e| "%g" % e }
+      xtick_texts = @opts[:x_ticks] || xticks.map{ |e| "%g" % e }
       w = area.w*0.7 / xticks.size
       rects = xticks.map{ |rx|
         ax = abs_x_positoin( rx, area, xrange )
@@ -85,6 +98,15 @@ module Charma
       end
     end
 
+    def tick_values(axis, range)
+      if @opts[:series].first[axis]
+        super(axis, range)
+      else
+        ticks = @opts[:"#{axis}_ticks"]
+        (1..ticks.size).map(&:to_f)
+      end
+    end
+
     def render( pdf, rect )
       stroke_rect(pdf, rect)
       title_text = @opts[:title]
@@ -105,7 +127,6 @@ module Charma
         render_xticks(pdf, xticks, xrange, xvalues)
       end
       render_x_grid(pdf, chart, xrange, xvalues)
-      
       render_legend(pdf, bottom) if bottom_legend?
       yvalues = tick_values(:y, yrange)
       render_yticks(pdf, yticks, yrange, yvalues)
