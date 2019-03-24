@@ -69,3 +69,6 @@ Layout/AlignHash:
 
 Layout/AlignParameters:
   Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
