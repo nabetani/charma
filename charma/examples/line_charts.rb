@@ -50,6 +50,20 @@ Charma::Document.new{ |doc|
           name: "10.0**t*3"
         },
       ]
+    },
+    {
+      title: "Name only X",
+      x_ticks: ["2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3", "2018-Q4"],
+      series:[
+        {
+          y: [41, -23, 52, -6, 18, 62, 70, 98],
+          name: "foo",
+        },
+        {
+          y: [63, -19, 2, 91, -2, 132, 93, 13],
+          name: "bar",
+        },
+      ]
     }
   ].each do |opts|
     doc.new_page do |page|
