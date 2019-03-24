@@ -57,9 +57,12 @@ module Charma
     end
 
     def render_xticks(pdf, area, xrange)
-      xtick_texts = tick_values( xrange ).map{ |e| "%g" % e }
-      rects = area.hsplit(*([1]*xtick_texts.size)).map{ |rc0|
-        rc0.hsplit(1,8,1)[1]
+      xticks = tick_values( xrange )
+      xtick_texts = xticks.map{ |e| "%g" % e }
+      w = area.w*0.7 / xticks.size
+      rects = xticks.map{ |rx|
+        ax = abs_x_positoin( rx, area, xrange )
+        Rect.new( ax-w/2, area.y, w, area.h )
       }
       draw_samesize_texts( pdf, rects, xtick_texts, valign: :top )
     end
