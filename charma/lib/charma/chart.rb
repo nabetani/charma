@@ -18,6 +18,14 @@ module Charma
       }
     end
 
+    def bottom_legend?
+      has_legend?
+    end
+
+    def has_legend?
+      @opts[:series].any?{ |s| ! s[:name].nil? }
+    end
+
     def abs_x_positoin(v, rc, xrange)
       (v-xrange[0]) * rc.w / (xrange[1]-xrange[0]) + rc.x
     end
@@ -87,6 +95,19 @@ module Charma
         h = pdf.height_of(text, size:1)
         size = [rc.w.to_f/w ,rc.h.to_f/h].min
         pdf.draw_text( text, size:size, at:rc.bottomleft )
+      end
+    end
+
+    def render_legend( pdf, rect )
+      names = @opts[:series].map.with_index{ |e,ix| e[:name] || "series #{ix}" }
+      rects = rect.hsplit( *([1]*names.size) )
+      name_areas, bar_areas = rects.map{ |rc| rc.hsplit(1,1) }.transpose
+      draw_samesize_texts( pdf, name_areas, names, align: :right )
+      cols = colors(names.size)
+      bar_areas.zip(cols).each do |rc0, col|
+        _, rc1, = rc0.vsplit(1,1,1)
+        rc, = rc1.hsplit(2,1)
+        fill_rect( pdf, rc, col )
       end
     end
   end

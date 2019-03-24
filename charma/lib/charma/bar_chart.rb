@@ -91,10 +91,11 @@ module Charma
     def render( pdf, rect )
       stroke_rect(pdf, rect)
       title_text = @opts[:title]
-      title, main, ticks = rect.vsplit(
+      title, main, ticks, bottom = rect.vsplit(
         (title_text ? 1 : 0),
-        7, 
-        (@opts[:x_ticks] ? 0.5 : 0))
+        7,
+        (@opts[:x_ticks] ? 0.5 : 0),
+        (bottom_legend? ? 0.5 : 0))
       draw_text( pdf, title, title_text ) if title_text
       hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
       ylabel, yticks, chart = main.hsplit(*hratio)
@@ -110,6 +111,7 @@ module Charma
       yvalues = ytick_values(yrange)
       render_yticks(pdf, yticks, yrange, yvalues)
       render_y_grid(pdf, chart, yrange, yvalues)
+      render_legend(pdf, bottom) if bottom_legend?
     end
   end
 end
