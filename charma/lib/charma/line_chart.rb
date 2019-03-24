@@ -51,16 +51,18 @@ module Charma
     def render( pdf, rect )
       stroke_rect(pdf, rect)
       title_text = @opts[:title]
-      title, main, ticks = rect.vsplit(
+      title, main, ticks, bottom = rect.vsplit(
         (title_text ? 1 : 0),
         7, 
-        (@opts[:x_ticks] ? 0.5 : 0))
+        (@opts[:x_ticks] ? 0.5 : 0),
+        (bottom_legend? ? 0.5 : 0))
       draw_text( pdf, title, title_text ) if title_text
       hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
       ylabel, yticks, chart = main.hsplit(*hratio)
       xrange = @opts[:x_range] || calc_range(:x)
       yrange = @opts[:y_range] || calc_range(:y)
       render_chart(pdf, chart, xrange, yrange)
+      render_legend(pdf, bottom) if bottom_legend?
       # if @opts[:y_label]
       #   render_rottext(pdf, ylabel, @opts[:y_label] )
       # end
