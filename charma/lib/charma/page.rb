@@ -37,7 +37,6 @@ module Charma
     end
 
     def render(pdf)
-      pdf.stroke_axis
       @graphs.each.with_index do |g,ix|
         g.render( pdf, area(pdf.margin_box, ix) )
       end

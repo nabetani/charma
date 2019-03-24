@@ -93,7 +93,6 @@ module Charma
 
     # BarChart の render とほぼ同じなのでなんとかする
     def render( pdf, rect )
-      stroke_rect(pdf, rect)
       title_text = @opts[:title]
       title, main, ticks, bottom = rect.vsplit(
         (title_text ? 1 : 0),
