@@ -22,7 +22,10 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Visit following pages:
+
+* https://github.com/nabetani/charma/tree/master/charma/examples
+* https://github.com/nabetani/charma
 
 ## Development
 
