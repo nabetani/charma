@@ -89,6 +89,7 @@ module Charma
       render_legend(pdf, bottom) if bottom_legend?
       yvalues = tick_values(yrange)
       render_yticks(pdf, yticks, yrange, yvalues)
+      render_y_grid(pdf, chart, yrange, yvalues)
         
       # end
       # if @opts[:x_ticks]

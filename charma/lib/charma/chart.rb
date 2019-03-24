@@ -135,6 +135,23 @@ module Charma
       svalues = yvalues.map{ |v| "%g " % v }
       draw_samesize_texts( pdf, rects, svalues, align: :right )
     end
+    
+    def render_y_grid(pdf, area, yrange, yvalues)
+      pdf.save_graphics_state do
+        pdf.line_width = 0.5
+        yvalues.each do |v|
+          if v==0
+            pdf.stroke_color "000000"
+            pdf.undash
+          else
+            pdf.stroke_color "888888"
+            pdf.dash([2,2])
+          end
+          abs_y = abs_y_positoin( v, area, yrange )
+          pdf.stroke_horizontal_line area.x, area.right, at: abs_y
+        end
+      end
+    end
 
   end
 end
