@@ -17,11 +17,6 @@ module Charma
       fill_rect( pdf, bar, col )
     end
 
-    # TODO: Chart に移動
-    def abs_y_positoin(v, rc, yrange)
-      (v-yrange[0]) * rc.h / (yrange[1]-yrange[0]) + rc.bottom
-    end
-
     def render_chart(pdf, rect, yrange)
       stroke_rect(pdf, rect)
       y_values = @opts[:y_values].map(&:to_f)

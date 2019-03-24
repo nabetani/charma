@@ -8,6 +8,14 @@ module Charma
       }
     end
 
+    def abs_x_positoin(v, rc, xrange)
+      (v-xrange[0]) * rc.w / (xrange[1]-xrange[0]) + rc.x
+    end
+
+    def abs_y_positoin(v, rc, yrange)
+      (v-yrange[0]) * rc.h / (yrange[1]-yrange[0]) + rc.bottom
+    end
+
     def fill_rect( pdf, rect, col )
       pdf.save_graphics_state do
         pdf.fill{
@@ -39,7 +47,7 @@ module Charma
         "%02x" % (v**0.5*255).round
       }
       Array.new(n){ |i|
-        t = i*3.0/n
+        t = i*3.0/n+1
         [f[t],f[t+1],f[t+2]].join
       }
     end
