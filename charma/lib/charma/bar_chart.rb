@@ -40,21 +40,6 @@ module Charma
       draw_samesize_texts( pdf, rects, @opts[:x_ticks], valign: :top )
     end
 
-    def tick_unit(v)
-      base = (10**Math.log10(v).round).to_f
-      man = v/base
-      return 0.5*base if man<0.6
-      return base if man<1.2
-      base*2
-    end
-
-    def ytick_values(yrange)
-      unit = tick_unit((yrange.max - yrange.min) * 0.1)
-      i_low = (yrange.min / unit).ceil
-      i_hi = (yrange.max / unit).floor
-      (i_low..i_hi).map{ |i| i*unit }
-    end
-
     def render_yticks(pdf, area, yrange, yvalues)
       h = (area.h / yvalues.size) * 0.7
       rects = yvalues.map{ |v|
@@ -108,7 +93,7 @@ module Charma
         _, _, xticks = ticks.hsplit(*hratio)
         render_xticks(pdf, xticks)
       end
-      yvalues = ytick_values(yrange)
+      yvalues = tick_values(yrange)
       render_yticks(pdf, yticks, yrange, yvalues)
       render_y_grid(pdf, chart, yrange, yvalues)
       render_legend(pdf, bottom) if bottom_legend?
