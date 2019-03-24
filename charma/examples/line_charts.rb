@@ -30,4 +30,4 @@ Charma::Document.new{ |doc|
       end
     end
   end
-}.render( "simple_line.pdf" )
+}.render( File.basename(__FILE__, ".*")+".pdf" )

@@ -64,4 +64,4 @@ Charma::Document.new{ |doc|
       end
     end
   end
-}.render( "simple_bar.pdf" )
+}.render( File.basename(__FILE__, ".*")+".pdf" )
