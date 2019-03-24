@@ -127,15 +127,6 @@ module Charma
       yvalues = tick_values(:y, yrange)
       render_yticks(pdf, yticks, yrange, yvalues)
       render_y_grid(pdf, chart, yrange, yvalues)
-        
-      # end
-      # if @opts[:x_ticks]
-      #   _, _, xticks = ticks.hsplit(*hratio)
-      #   render_xticks(pdf, xticks)
-      # end
-      # yvalues = ytick_values(yrange)
-      # render_yticks(pdf, yticks, yrange, yvalues)
-      # render_y_grid(pdf, chart, yrange, yvalues)
     end  
   end
 end
