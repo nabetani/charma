@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    charma (0.1.0)
+    charma (0.1.1)
       prawn (~> 2.2.2)
 
 GEM
