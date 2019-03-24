@@ -6,16 +6,16 @@ module Charma
       @opts = opts
     end
 
-    def draw_bar(pdf, rect, yrange, ys)
+    def draw_bar(pdf, rect, yrange, ys, cols)
       ratio = 0.75
       _, bars, = rect.hsplit( (1-ratio)/2, ratio, (1-ratio)/2 )
       bar_rects = bars.hsplit(*Array.new(ys.size,1))
-      bar_rects.zip(ys).each.with_index do |(bar, y), ix|
+      bar_rects.zip(ys, cols) do |bar, y, col|
         ay = abs_y_positoin(y, bar, yrange)
         zero = abs_y_positoin(0, bar, yrange)
         b, t = [ ay, zero ].minmax
         rc = Rect.new( bar.x, t, bar.w, (t-b) )
-        fill_rect( pdf, rc, "666666" )
+        fill_rect( pdf, rc, col )
       end
     end
 
@@ -23,8 +23,13 @@ module Charma
       stroke_rect(pdf, rect)
       y_values = values(:y).transpose
       bar_areas = rect.hsplit(*Array.new(y_values.size,1))
-      y_values.zip(bar_areas).each do |ys, rc|
-        draw_bar(pdf, rc, yrange, ys)
+      cols = if y_values.first.size==1
+        colors(y_values.size).map{ |e| [e] }
+      else
+        [colors(y_values.first.size)] * y_values.size
+      end
+      y_values.zip(bar_areas, cols).each do |ys, rc, c|
+        draw_bar(pdf, rc, yrange, ys, c)
       end
     end
 
