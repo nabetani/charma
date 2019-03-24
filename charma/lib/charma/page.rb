@@ -50,5 +50,9 @@ module Charma
     def add_linechart(opts)
       @graphs.push LineChart.new(opts)
     end
+
+    def add_violinchart(opts)
+      @graphs.push ViolinChart.new(opts)
+    end
   end
 end

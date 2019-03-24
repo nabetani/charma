@@ -17,6 +17,8 @@ end
 
 foobar = SampleMaker.new(20000)
 
+small = SampleMaker.new(6)
+
 Charma::Document.new{ |doc|
   [
     {
@@ -29,6 +31,20 @@ Charma::Document.new{ |doc|
         {
           name: "bar",
           y: Array.new(4){ |n| foobar.samples(n+2, (n+2)*2, 6) }
+        },
+      ],
+      x_ticks: %w(Q1 Q2 Q3 Q4),
+    },
+    {
+      title: "Small size sample",
+      series:[
+        {
+          name: "foo",
+          y: Array.new(4){ |n| small.samples(n+2, (n+2)*2) }
+        },
+        {
+          name: "bar",
+          y: Array.new(4){ |n| small.samples(n+2, (n+2)*2, 6) }
         },
       ],
       x_ticks: %w(Q1 Q2 Q3 Q4),
