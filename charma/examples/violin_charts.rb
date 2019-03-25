@@ -9,7 +9,7 @@ SampleMaker = Struct.new(:size) do
   end
 
   def samples(*peaks)
-    srand(0)
+    srand(peaks.sum)
     Array.new(size){
       r + peaks.sample
     }
@@ -36,20 +36,23 @@ Charma::Document.new do |doc|
       ],
       x_ticks: %w(Q1 Q2 Q3 Q4),
     },
+    [10,50].map do |bins|
     {
-      title: "Small size sample",
+        title: "Small size sample (bins=#{bins})",
+        bins: bins,
       series:[
         {
           name: "foo",
-          y: Array.new(4){ |n| small.samples(n+2, (n+2)*2) }
+            y: Array.new(4){ |n| small.samples(n+4, (n+2)*2) }
         },
         {
           name: "bar",
-          y: Array.new(4){ |n| small.samples(n+2, (n+2)*2, 6) }
+            y: Array.new(4){ |n| small.samples(n+4, (n+2)*2, 6) }
         },
       ],
       x_ticks: %w(Q1 Q2 Q3 Q4),
-    },
+      }
+    end
   ].each do |opts|
     doc.new_page do |page|
       case opts
