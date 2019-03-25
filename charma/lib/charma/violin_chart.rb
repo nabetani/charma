@@ -36,6 +36,7 @@ module Charma
         cx = rc.x + rc.w/2
         h = rc.h / hist.size.to_f
         hist.each.with_index do |f, ix|
+          next if f==0
           w = rc.w * f
           top = rc.bottom + h*(ix+1)
           edge = 1e-1 # バーの隙間を埋める
