@@ -14,12 +14,12 @@ def macos?
 end
 
 unless macos?
-  $stderr.puts( "This sample runs only on macOS" )
+  warn( "This sample runs only on macOS" )
   exit
 end
 
 unless File.exist?( File.expand_path(fontpath) )
-  $stderr.puts( "このサンプルを実行するには、IPAexゴシック Regular をインストールする必要があります" )
+  warn( "このサンプルを実行するには、IPAexゴシック Regular をインストールする必要があります" )
   exit
 end
 
