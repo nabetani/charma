@@ -57,7 +57,7 @@ module Charma
     end
 
     def make_histograms( vals, range )
-      hist_size = [10,Math.sqrt( meansize(vals) ).round].max
+      hist_size = @opts[:bins] || [10,Math.sqrt( meansize(vals) ).round].max
       min = range.min
       step = (range.max - min).to_f / hist_size
       bottoms = Array.new(hist_size){ |ix| min + (ix+1)*step }
