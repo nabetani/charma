@@ -2,8 +2,8 @@
 
 module Charma
   class Page
-    def initialize( doc )
-      @doc = doc
+    def initialize( opts )
+      @opts = opts
       @graphs = []
     end
 
@@ -11,7 +11,7 @@ module Charma
       {
         page_size: "A4",
         page_layout: :landscape,
-      }
+      }.merge(@opts)
     end
 
     def split_rect( rc, pos, size )
@@ -37,6 +37,7 @@ module Charma
     end
 
     def render(pdf)
+      pdf.font File.expand_path(@opts[:font]) if @opts[:font]
       @graphs.each.with_index do |g,ix|
         g.render( pdf, area(pdf.margin_box, ix) )
       end
