@@ -1,8 +1,11 @@
 # Charma
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/charma`. To experiment with that code, run `bin/console` for an interactive prompt.
+Create pages filled with charts in PDF format
 
-TODO: Delete this and the text above, and describe your gem
+適当にデータを突っ込んだらいい感じのグラフを作ってくれることを目指している。
+出力は PDF のみ。
+
+入力は `Hash`。CSV を読んだりする機能はない。
 
 ## Installation
 
@@ -22,9 +25,23 @@ Or install it yourself as:
 
 ## Usage
 
+```ruby
+require 'charma'
+
+Charma::Document.new do |doc|
+  doc.new_page do |page|
+    page.add_barchart(
+      series:[{y:[3,1,4,1,5]}],
+      x_ticks:%w[ foo bar baz qux quux]
+    )
+  end
+  doc.render( File.basename(__FILE__, ".*")+".pdf" )
+end
+```
+
 Visit following pages:
 
-* https://github.com/nabetani/charma/tree/master/charma/examples
+* https://github.com/nabetani/charma/tree/master/examples
 * https://github.com/nabetani/charma
 
 ## Development
@@ -44,3 +61,26 @@ The gem is available as open source under the terms of the [MIT License](https:/
 ## Code of Conduct
 
 Everyone interacting in the Charma project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/charma/blob/master/CODE_OF_CONDUCT.md).
+
+## Change logs
+
+### v0.1.2
+
+2019.3.25
+
+* フォント指定を可能にした
+* Violn chart で bins を指定可能にした
+
+### v0.1.1
+
+2019.3.24
+
+* デバッグ用に描画していた枠を撤去した
+* 利用例を追加した
+* バイオリンチャートに外枠をつけた
+
+### v0.1.0
+
+2019.3.24
+
+最初のリリース
