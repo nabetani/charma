@@ -1,58 +1,47 @@
 # frozen_string_literal: true
 
 module Charma
+  # Charma Page
   class Page
-    def initialize( opts )
-      @opts = opts
-      @graphs = []
+    def initialize(
+      font:nil,
+      page_size:DEFAULT_PAGE_SIZE,
+      page_layout: :landscape,
+      &block
+    )
+      @charts = []
+      @font = font
+      @page_size = page_size
+      @page_layout = page_layout
+      @size = parse_papersize
+      block[self] if block
     end
 
-    def create_opts
-      {
-        page_size: "A4",
-        page_layout: :landscape,
-      }.merge(@opts)
-    end
-
-    def split_rect( rc, pos, size )
-      horz = ([10,1]*size[0])[0..-2]
-      vrect = rc.hsplit( *horz ).select.with_index{ |_,ix| ix.even? }[pos[0]]
-      vert = ([10,1]*size[1])[0..-2]
-      vrect.vsplit( *vert ).select.with_index{ |_,ix| ix.even? }[pos[1]]
-    end
-
-    def area(mb, ix)
-      t = Rect.new(mb.left, mb.top, mb.width, mb.height)
-      c = @graphs.size
-      case c
-      when 1
-        t
-      when 2..3
-        split_rect( t, [ix,0], [c,1] )
+    def parse_papersize
+      case @page_size
+      when /^[AB]\d+$/
+        PAPER_SIZES[@page_size.to_sym]
+      when /^([0-9]+(?:\.[0-9]*)?)[^0-9\.]+([0-9]+(?:\.[0-9]*)?)/
+        w, h = [$1,$2].map(&:to_f).minmax
+        w + h * 1i
       else
-        w = Math.sqrt(c).ceil
-        h = (c.to_f/w).ceil
-        split_rect( t, ix.divmod(w).reverse, [w, h] )
+        raise Charma::Error, "unexpected size : #{@page_size}"
       end
     end
 
-    def render(pdf)
-      pdf.font File.expand_path(@opts[:font]) if @opts[:font]
-      @graphs.each.with_index do |g,ix|
-        g.render( pdf, area(pdf.margin_box, ix) )
-      end
+    attr_reader :size
+    attr_reader :charts
+
+    def w
+      size.real
     end
 
-    def add_barchart(opts)
-      @graphs.push BarChart.new(opts)
+    def h
+      size.imag
     end
 
-    def add_linechart(opts)
-      @graphs.push LineChart.new(opts)
-    end
-
-    def add_violinchart(opts)
-      @graphs.push ViolinChart.new(opts)
+    def add_chart( chart )
+      @charts.push chart
     end
   end
 end

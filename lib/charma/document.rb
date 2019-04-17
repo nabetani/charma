@@ -1,29 +1,73 @@
 # frozen_string_literal: true
 
 module Charma
+  # Charma Document
   class Document
-    def initialize(opts={}, &block )
+    # ドキュメントを生成
+    # @param [String] font デフォルトフォント名。
+    # @param [String] page_size デフォルトページサイズ。"A4" のような形式か、"210x297" のような形式。
+    # @param [Symbol] page_layout :landscape (横長) または :portlait (縦長)。
+    def initialize(
+      font:nil,
+      page_size:DEFAULT_PAGE_SIZE,
+      page_layout: :landscape,
+      &block
+    )
+      @opts = {}
       @pages = []
-      @opts = opts
-      block[self]
-    end
-
-    def new_page(opts={},&block)
-      page = Page.new(opts)
-      block[page]
-      @pages.push page
-    end
-
-    def render( filename )
-      raise "no page added" if @pages.empty?
-      opts = @pages.first.create_opts.merge(@opts)
-      Prawn::Document.generate(filename, opts) do |pdf|
-        pdf.font( File.expand_path(@opts[:font]) ) if @opts[:font]
-        @pages.each.with_index do |page,ix|
-          pdf.start_new_page(page.create_opts) if ix != 0
-          page.render(pdf)
-        end
+      @font = font
+      @page_size = page_size
+      unless [ :landscape, :portlait, nil].include?(page_layout)
+        raise Charma::Error, "#{page_layout.inspect} is not supported page_layout"
       end
+      @page_layout = page_layout
+      block[self] if block
+    end
+
+    # ページを追加
+    def add_page(
+      font:nil,
+      page_size:nil,
+      page_layout:nil,
+      &block
+    )
+      font ||= @font
+      page_size ||= @page_size
+      page = Page.new(
+        font:(font||@font),
+        page_size:(page_size||@page_size),
+        page_layout:(page_layout||@page_layout) )
+      block[page] if block
+      @pages.push page
+      page
+    end
+
+    def filetype_from( filename )
+      ext = File.extname(filename)
+      case ext.downcase
+      when ".pdf"
+        :pdf
+      when ".svg"
+        :svg
+      else
+        raise Charma::Error, "#{ext} is not supported filetype"
+      end
+    end
+
+    def renderer_for( ft )
+      case ft
+      when :pdf
+        PDFRenderer
+      when :svg
+        SVGRenderer
+      else
+        raise Charma::Error, "#{ft.inspect} is not supported type"
+      end
+    end
+
+    def render( filename, file_type:nil )
+      t = renderer_for( file_type || filetype_from(filename))
+      t.new(@pages, @opts).render(filename)
     end
   end
 end
