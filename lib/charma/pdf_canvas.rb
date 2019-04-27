@@ -64,5 +64,26 @@ module Charma
         size:font_size
       )
     end
+
+    def pdf_color(color)
+      case color.size
+      when 3
+        (0..2).map{ |x| color[x]*2 }.join
+      when 6
+        color
+      else
+        raise "#{color.inspect} is not expected color format"
+      end
+    end
+
+    def fill_rect( rect, color )
+      @pdf.save_graphics_state do
+        pr = pdf_rect(rect)
+        @pdf.fill{
+          @pdf.fill_color( pdf_color(color) )
+          @pdf.rectangle( [pr.x,  pr.bottom], pr.w, pr.h )
+        }
+      end
+    end
   end
 end
