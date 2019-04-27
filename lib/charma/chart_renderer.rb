@@ -9,7 +9,7 @@ module Charma
     end
 
     def render_title
-      @canvas.text( "title", @area )
+      @canvas.text( @chart[:title], @area )
       @canvas.text( "test", Rect.new( 0, 0, 100, 100 ) )
       @canvas.text( "test", Rect.new( 440, 0, 100, 100 ) )
       @canvas.text( "test", Rect.new( 0, 620, 100, 100 ) )
