@@ -15,12 +15,14 @@ module Charma
         raise Charma::Error, "unexpected chart type: #{ct}"
       end
     end
-    
+
     def render_page( canvas, page )
+      canvas.new_page(page)
+      page_rect = canvas.page_rect
+      p page_rect
       page.charts.each do |chart|
-        area = Rect.new( 0, 0, page.w, page.h )
         t = chart_renderer(chart.chart_type)
-        t.new( chart, canvas, area ).render
+        t.new( chart, canvas, page_rect ).render
       end
     end
   end

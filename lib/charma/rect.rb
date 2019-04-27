@@ -8,7 +8,7 @@ module Charma
       rel_hs.map{ |rel_h|
         abs_h = rel_h.to_f * h / rel_sum
         rc = Rect.new( x, abs_y, w, abs_h )
-        abs_y -= abs_h
+        abs_y += abs_h
         rc
       }
     end
@@ -25,7 +25,7 @@ module Charma
     end
 
     def center
-      [x+w/2, y-h/2]
+      [x+w/2.0, y+h/2.0]
     end
 
     def rot90
@@ -38,15 +38,11 @@ module Charma
     end
 
     def bottom
-      y-h
+      y+h
     end
 
     def topleft
-      [x,y]
-    end
-
-    def bottomleft
-      [x, y-h]
+      x.to_f + y*1.0i
     end
   end
 end

@@ -6,7 +6,7 @@ module Charma
     def initialize(
       font:nil,
       page_size:DEFAULT_PAGE_SIZE,
-      page_layout: :landscape,
+      page_layout: nil,
       &block
     )
       @charts = []
@@ -17,13 +17,27 @@ module Charma
       block[self] if block
     end
 
+    def adjust_layout(size)
+      s,l = size.rectangular.minmax
+      case @page_layout
+      when :landscape
+        l+s*1i;
+      when :portlait
+        s+l*1i;
+      when nil
+        size
+      else
+        raise "#{@page_layout.inspect} is not supported page_layout"
+      end
+    end
+
     def parse_papersize
       case @page_size
       when /^[AB]\d+$/
-        PAPER_SIZES[@page_size.to_sym]
+        adjust_layout(PAPER_SIZES[@page_size.to_sym])
       when /^([0-9]+(?:\.[0-9]*)?)[^0-9\.]+([0-9]+(?:\.[0-9]*)?)/
         w, h = [$1,$2].map(&:to_f).minmax
-        w + h * 1i
+        adjust_layout(w + h * 1.0i)
       else
         raise Charma::Error, "unexpected size : #{@page_size}"
       end

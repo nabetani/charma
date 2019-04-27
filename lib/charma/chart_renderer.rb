@@ -8,7 +8,16 @@ module Charma
       @area = area
     end
 
+    def render_title
+      @canvas.text( "title", @area )
+      @canvas.text( "test", Rect.new( 0, 0, 100, 100 ) )
+      @canvas.text( "test", Rect.new( 440, 0, 100, 100 ) )
+      @canvas.text( "test", Rect.new( 0, 620, 100, 100 ) )
+      @canvas.text( "test", Rect.new( 440, 620, 100, 100 ) )
+    end
+
     def render
+      render_title
     end
   end
 end
