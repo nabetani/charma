@@ -17,13 +17,17 @@ module Charma
       block[self] if block
     end
 
+    attr_reader :size
+    attr_reader :charts
+    attr_reader :page_layout
+
     def adjust_layout(size)
       s,l = size.rectangular.minmax
       case @page_layout
       when :landscape
-        l+s*1i;
-      when :portlait
-        s+l*1i;
+        l+s*1i
+      when :portrait
+        s+l*1i
       when nil
         size
       else
@@ -34,17 +38,19 @@ module Charma
     def parse_papersize
       case @page_size
       when /^[AB]\d+$/
-        adjust_layout(PAPER_SIZES[@page_size.to_sym])
+        s = PAPER_SIZES[@page_size.to_sym]
+        raise "#{@page_size.inspect} is not supported paper size" unless s
+        adjust_layout(s)
       when /^([0-9]+(?:\.[0-9]*)?)[^0-9\.]+([0-9]+(?:\.[0-9]*)?)/
         w, h = [$1,$2].map(&:to_f).minmax
+        adjust_layout(w + h * 1.0i)
+      when Array
+        w, h = @page_size.minmax
         adjust_layout(w + h * 1.0i)
       else
         raise Charma::Error, "unexpected size : #{@page_size}"
       end
     end
-
-    attr_reader :size
-    attr_reader :charts
 
     def w
       size.real
