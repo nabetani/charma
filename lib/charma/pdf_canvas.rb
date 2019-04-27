@@ -24,13 +24,31 @@ module Charma
       )
     end
 
+    def rottext( t, rect, angle, opts={} )
+      pr = pdf_rect(rect).rot(angle)
+      @pdf.rotate(angle, origin: pr.center) do
+        w = @pdf.width_of(t, size:1)
+        h = @pdf.height_of(t, size:1)
+        font_size = [pr.w.to_f/w ,pr.h.to_f/h].min
+        @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
+          @pdf.transparent(1) { @pdf.stroke_bounds }
+        end
+        @pdf.text_box(
+          t,
+          at: [pr.x, pr.bottom],
+          width: pr.w,
+          height: pr.h,
+          align: :center,
+          valign: :center,
+            size:font_size )
+      end
+    end
+
     def text( t, rect, opts = {} )
       pr = pdf_rect(rect)
       w = @pdf.width_of(t, size:1)
       h = @pdf.height_of(t, size:1)
       font_size = [pr.w.to_f/w ,pr.h.to_f/h].min * 0.95
-
-
 
       @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
         @pdf.transparent(1) { @pdf.stroke_bounds }

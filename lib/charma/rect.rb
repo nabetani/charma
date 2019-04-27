@@ -28,9 +28,9 @@ module Charma
       [x+w/2.0, y+h/2.0]
     end
 
-    def rot90
+    def rot(angle)
       cx, cy = center
-      Rect.new( cx-h/2, cy+w/2, h, w )
+      Rect.new( cx-h/2, cy-w/2, h, w )
     end
 
     def right
@@ -39,10 +39,6 @@ module Charma
 
     def bottom
       y+h
-    end
-
-    def topleft
-      x.to_f + y*1.0i
     end
   end
 end

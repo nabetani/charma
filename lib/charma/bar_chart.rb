@@ -7,7 +7,8 @@ module Charma
       title:nil,
       series:required(Array),
       x_ticks:nil,
-      x_title:nil
+      x_title:nil,
+      y_title:nil
     }.freeze
 
     def initialize(opts)
