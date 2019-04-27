@@ -6,10 +6,6 @@ module Charma
       @pdf = pdf
     end
 
-    def new_page( page )
-      # TODO: set page size
-    end
-
     def page_rect
       mb = @pdf.margin_box
       Rect.new(mb.left, mb.height - mb.top, mb.width, mb.height)
