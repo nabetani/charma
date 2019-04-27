@@ -23,7 +23,6 @@ module Charma
         zero = abs_y_positoin(0, bar, yrange)
         t, b = [ ay, zero ].minmax
         rc = Rect.new( bar.x, t, bar.w, b-t )
-        p [ rc, col ]
         @canvas.fill_rect( rc, col )
       end
     end
