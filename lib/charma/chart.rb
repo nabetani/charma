@@ -14,6 +14,10 @@ module Charma
       @opts = opts
     end
 
+    def has_y2?
+      false
+    end
+
     def [](key)
       @opts[key]
     end
