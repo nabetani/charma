@@ -21,7 +21,7 @@ module Charma
     end
 
     def rottext( t, rect, angle, opts={} )
-      pr = pdf_rect(rect).rot(angle)
+      pr = pdf_rect(rect).rot
       @pdf.rotate(angle, origin: pr.center) do
         w = @pdf.width_of(t, size:1)
         h = @pdf.height_of(t, size:1)

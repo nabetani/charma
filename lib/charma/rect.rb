@@ -25,10 +25,18 @@ module Charma
     end
 
     def center
-      [x+w/2.0, y+h/2.0]
+      [cx, cy]
     end
 
-    def rot(angle)
+    def cx
+      x+w/2.0
+    end
+
+    def cy
+      y+h/2.0
+    end
+
+    def rot
       cx, cy = center
       Rect.new( cx-h/2, cy-w/2, h, w )
     end
