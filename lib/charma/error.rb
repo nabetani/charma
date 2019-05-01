@@ -6,5 +6,6 @@ module Charma
   module Errors
     class InvalidPageSize < Error; end
     class InvalidPageLayout < Error; end
+    class InvalidOption < Error; end
   end
 end
