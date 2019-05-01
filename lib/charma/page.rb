@@ -17,6 +17,7 @@ module Charma
 
     attr_reader :size
     attr_reader :charts
+    attr_reader :font
 
     def adjust_layout(size, page_layout)
       s,l = size.rectangular.minmax
