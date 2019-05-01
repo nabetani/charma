@@ -75,3 +75,6 @@ Style/DoubleNegation:
 
 Style/PerlBackrefs:
   Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false
