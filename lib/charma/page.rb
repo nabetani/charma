@@ -29,7 +29,7 @@ module Charma
       when nil
         size
       else
-        raise "#{@page_layout.inspect} is not supported page_layout"
+        raise Errors::InvalidPageLayout, "#{@page_layout.inspect} is not supported page_layout"
       end
     end
 
@@ -37,7 +37,7 @@ module Charma
       case page_size
       when /^[AB]\d+$/
         s = PAPER_SIZES[page_size.to_sym]
-        raise "#{page_size.inspect} is not supported paper size" unless s
+        raise Errors::InvalidPageSize, "#{page_size.inspect} is not supported paper size" unless s
         adjust_layout(s, page_layout)
       when /^([0-9]+(?:\.[0-9]*)?)[^0-9\.]+([0-9]+(?:\.[0-9]*)?)/
         w, h = [$1,$2].map(&:to_f).minmax
@@ -46,7 +46,7 @@ module Charma
         w, h = page_size.minmax
         adjust_layout(w + h * 1.0i, page_layout)
       else
-        raise Charma::Error, "unexpected size : #{page_size}"
+        raise Errors::InvalidPageSize, "unexpected size : #{page_size}"
       end
     end
 
