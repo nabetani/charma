@@ -147,8 +147,19 @@ module Charma
     end
 
     def draw_bottom_regend(area, names, colors)
-      rects = area.hsplit( *([1]*names.size) )
-      left_rects, _, text_rects, _ = rects.map{ |e| e.hsplit(10,1,10,2) }.transpose
+      ratio = [10,0.5,10,2]
+      xcount = (1..names.size).max_by{ |w|
+        h = ( names.size.to_r / w.to_r ).ceil
+        cw = area.w.to_f / w * ratio[2] / ratio.sum
+        ch = area.h.to_f / h
+        rects = [ Rect.new( 0, 0, cw, ch ) ]*names.size
+        @canvas.measure_samesize_texts( rects, names )
+      }
+      ycount = ( names.size.to_r / xcount.to_r ).ceil
+      rects = area.vsplit( *Array.new(ycount, 1) ).map{ |rc|
+        rc.hsplit( *Array.new(xcount, 1) )
+      }.flatten[0,names.size]
+      left_rects, _, text_rects, = rects.map{ |e| e.hsplit(*ratio) }.transpose
       bar_rects = left_rects.map{ |e| e.vsplit(1,1,1)[1] }
       bar_rects.zip(colors).each do |rc, col|
         @canvas.fill_rect( rc, col )

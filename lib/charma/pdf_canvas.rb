@@ -96,13 +96,17 @@ module Charma
       end
     end
 
+    def measure_samesize_texts( rects, texts )
+      texts.zip(rects).map{ |txt,rc|
+        w = @pdf.width_of(txt, size:1)
+        h = @pdf.height_of(txt, size:1)
+        [rc.w.to_f/w, rc.h.to_f/h].min
+      }.min
+    end
+
     def draw_samesize_texts( rects, texts, align: :center )
       @pdf.save_graphics_state do
-        size = texts.zip(rects).map{ |txt,rc|
-          w = @pdf.width_of(txt, size:1)
-          h = @pdf.height_of(txt, size:1)
-          [rc.w.to_f/w, rc.h.to_f/h].min
-        }.min
+        size = measure_samesize_texts( rects, texts )
         texts.zip(rects).each do |txt, rc|
           text( txt, rc, font_size:size, align:align )
         end
