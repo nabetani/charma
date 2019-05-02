@@ -100,5 +100,25 @@ RSpec.describe Charma::BarChartRenderer do
       expect( cols.flatten.uniq.size ).to eq(3) # 系列の数だけ色がある
     end
   end
+
+  describe "#render_chart" do
+    it "renders bars ( 1 series, 3 values )" do
+      chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }])
+      fakeCanvas = FakeCanvas.new
+      r = Charma::BarChartRenderer.new( chart, fakeCanvas, Charma::Rect.new( 0, 0, 100, 100) )
+      r.render_chart
+      fill_rects = fakeCanvas.called.select{ |m| m[:method]==:fill_rect }
+      expect( fill_rects.size ).to eq(3)
+    end
+
+    it "renders bars ( 5 series, 3 values )" do
+      chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }]*5)
+      fakeCanvas = FakeCanvas.new
+      r = Charma::BarChartRenderer.new( chart, fakeCanvas, Charma::Rect.new( 0, 0, 100, 100) )
+      r.render_chart
+      fill_rects = fakeCanvas.called.select{ |m| m[:method]==:fill_rect }
+      expect( fill_rects.size ).to eq(15)
+    end
+  end
 end
 
