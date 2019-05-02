@@ -43,7 +43,7 @@ module Charma
           "%02x" % (v**0.5*255).round
         }
         Array.new(n){ |i|
-          t = i*3.0/n+0.5
+          t = i*3.0/n+2
           [f[t],f[t+1],f[t+2]].join
         }
       end
@@ -55,8 +55,8 @@ module Charma
       if scount==1
         seq_colors(ssize).map{ |e| [e] }
       else
-      [seq_colors(scount)] * ssize
-    end
+        [seq_colors(scount)] * ssize
+      end
     end
 
     def render_chart
