@@ -44,6 +44,9 @@ module Charma
       y_values.zip(bar_areas, create_colors).each do |ys, rc, cols|
         draw_bars(ys, rc, cols, yrange)
       end
+      y_ticks = tick_values(:y, yrange)
+      draw_y_grid(@areas.chart, yrange, y_ticks)
+      @canvas.stroke_rect(@areas.chart)
     end
   end
 end

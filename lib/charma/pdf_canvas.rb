@@ -11,6 +11,11 @@ module Charma
       Rect.new(mb.left, mb.height - mb.top, mb.width, mb.height)
     end
 
+    def pdf_y( y )
+      mb = @pdf.margin_box
+      mb.top - y
+    end
+
     def pdf_rect( rc )
       mb = @pdf.margin_box
       Rect.new(
@@ -79,6 +84,34 @@ module Charma
           @pdf.fill_color( pdf_color(color) )
           @pdf.rectangle( [pr.x,  pr.bottom], pr.w, pr.h )
         }
+      end
+    end
+
+    def stroke_rect(rect)
+      @pdf.save_graphics_state do
+        pr = pdf_rect(rect)
+        @pdf.stroke{
+          @pdf.rectangle( [pr.x, pr.bottom], pr.w, pr.h )
+        }
+      end
+    end
+
+    def horizontal_line( left, right, y, style: :solid, color:"000", color2:"fff" )
+      @pdf.save_graphics_state do
+        case style
+        when :solid
+          @pdf.stroke_color pdf_color(color)
+          @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+        when :dash
+          @pdf.dash([2,2])
+          @pdf.stroke_color pdf_color(color)
+          @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+          @pdf.dash([2,2], phase:2)
+          @pdf.stroke_color pdf_color(color2)
+          @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+        else
+          raise Errors::InternalError, "unexpected line style: #{style.inspect}"
+        end
       end
     end
   end

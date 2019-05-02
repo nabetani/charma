@@ -38,5 +38,6 @@ module Charma
     def [](key)
       @opts[key]
     end
+
   end
 end

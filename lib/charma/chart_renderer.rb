@@ -23,12 +23,47 @@ module Charma
 
     def scale_value(axis, v)
       v
+      # TODO: refer scale
       # case scale_type(axis)
       # when :log10
       #   Math.log10(v)
       # else
       #   v
       # end
+    end
+
+    def unscale_value( axis, v )
+      v
+      # TODO: refer scale
+    end
+
+    def tick_unit(v)
+      base = (10**Math.log10(v).round).to_f
+      man = v/base
+      return 0.5*base if man<0.6
+      return base if man<1.2
+      base*2
+    end
+
+    def tick_values(axis, range)
+      min, max = range.minmax.map{ |e| scale_value( axis, e ) }
+      unit = tick_unit((max - min) * 0.1)
+      i_low = (min / unit).ceil
+      i_hi = (max / unit).floor
+      (i_low..i_hi).map{ |i| unscale_value( axis, i*unit ) }
+    end
+
+    def abs_y_positoin( v, area, range )
+      ry, min, max = [ v, *yrange ].map{ |e| scale_value(:y, e) }
+      (ry-min) * rc.h / (max-min) + rc.bottom
+    end
+
+    def draw_y_grid(area, range, ticks)
+      ticks.each do |v|
+        abs_y = abs_y_positoin( v, area, range )
+        c = v.zero? ? "000" : "aaa"
+        @canvas.horizontal_line(area.x, area.right, abs_y, color:c )
+      end
     end
 
     def seq_colors(n)
