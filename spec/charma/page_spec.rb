@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Charma::Page do
-  describe "Page behavior" do
-    it "defaults appropriate values" do
+  describe ".new" do
+    it "creates Page with appropriate values" do
       page = Charma::Page.new
       expect(page.font).to be nil
       expect(page.size).to eq(210.0+297.0i)
@@ -29,6 +29,48 @@ RSpec.describe Charma::Page do
         expect(po.w).to eq(shorter)
         expect(po.h).to eq(longer)
       end
+    end
+
+    it 'can create with "100x200" style page_size' do
+      page0 = Charma::Page.new( page_size: "100x200" )
+      expect(page0.w).to eq(100)
+      expect(page0.h).to eq(200)
+      page1 = Charma::Page.new( page_size: "400x300" )
+      expect(page1.w).to eq(400)
+      expect(page1.h).to eq(300)
+      page2 = Charma::Page.new( page_size: "100x200", page_layout: :landscape )
+      expect(page2.w).to eq(200)
+      expect(page2.h).to eq(100)
+      page3 = Charma::Page.new( page_size: "400x300", page_layout: :landscape )
+      expect(page3.w).to eq(400)
+      expect(page3.h).to eq(300)
+      page4 = Charma::Page.new( page_size: "100x200", page_layout: :portrait )
+      expect(page4.w).to eq(100)
+      expect(page4.h).to eq(200)
+      page5 = Charma::Page.new( page_size: "400x300", page_layout: :portrait )
+      expect(page5.w).to eq(300)
+      expect(page5.h).to eq(400)
+    end
+
+    it "can create with Array page_size" do
+      page0 = Charma::Page.new( page_size: [100,200] )
+      expect(page0.w).to eq(100)
+      expect(page0.h).to eq(200)
+      page1 = Charma::Page.new( page_size: [400,300] )
+      expect(page1.w).to eq(400)
+      expect(page1.h).to eq(300)
+      page2 = Charma::Page.new( page_size: [100,200], page_layout: :landscape )
+      expect(page2.w).to eq(200)
+      expect(page2.h).to eq(100)
+      page3 = Charma::Page.new( page_size: [400,300], page_layout: :landscape )
+      expect(page3.w).to eq(400)
+      expect(page3.h).to eq(300)
+      page4 = Charma::Page.new( page_size: [100,200], page_layout: :portrait )
+      expect(page4.w).to eq(100)
+      expect(page4.h).to eq(200)
+      page5 = Charma::Page.new( page_size: [400,300], page_layout: :portrait )
+      expect(page5.w).to eq(300)
+      expect(page5.h).to eq(400)
     end
 
     it "raises exception if page size is unexpected" do
