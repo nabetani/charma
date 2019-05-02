@@ -40,10 +40,10 @@ module Charma
         raise Errors::InvalidPageSize, "#{page_size.inspect} is not supported paper size" unless s
         adjust_layout(s, page_layout)
       when /^([0-9]+(?:\.[0-9]*)?)[^0-9\.]+([0-9]+(?:\.[0-9]*)?)/
-        w, h = [$1,$2].map(&:to_f).minmax
+        w, h = [$1,$2].map(&:to_f)
         adjust_layout(w + h * 1.0i, page_layout)
       when Array
-        w, h = page_size.minmax
+        w, h = page_size
         adjust_layout(w + h * 1.0i, page_layout)
       else
         raise Errors::InvalidPageSize, "unexpected size : #{page_size}"
