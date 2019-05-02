@@ -14,7 +14,7 @@ module Charma
       [ ymin, ymax ]
     end
 
-    def draw_bar( ys, rc, cols, yrange )
+    def draw_bars( ys, rc, cols, yrange )
       ratio = 0.75
       _, bars, = rc.hsplit( (1-ratio)/2, ratio, (1-ratio)/2 )
       bar_rects = bars.hsplit(*Array.new(ys.size,1))
@@ -27,13 +27,40 @@ module Charma
       end
     end
 
+    def seq_colors(n)
+      case n
+      when 1..6
+        %w(00f f00 0a0 f0f fa0 0af)[0,n]
+      else
+        f = lambda{ |t0|
+          v = lambda{ |t|
+            case t
+            when 0..1 then t
+            when 1..2 then 2-t
+            else 0
+            end
+          }[t0 % 3]
+          "%02x" % (v**0.5*255).round
+        }
+        Array.new(n){ |i|
+          t = i*3.0/n+0.5
+          [f[t],f[t+1],f[t+2]].join
+        }
+      end
+    end
+
+    def create_colors
+      scount = @chart[:series].size
+      ssize = @chart[:series].map{ |s| s[:y].size }.max
+      [seq_colors(scount)] * ssize
+    end
+
     def render_chart
       yrange = calc_yrange
       y_values = @chart[:series].map{ |s| s[:y] }.transpose
       bar_areas = @areas.chart.hsplit(*Array.new(y_values.size,1))
-      y_values.zip(bar_areas).each do |ys, rc|
-        cols = %w(f00 00f)
-        draw_bar(ys, rc, cols, yrange)
+      y_values.zip(bar_areas, create_colors).each do |ys, rc, cols|
+        draw_bars(ys, rc, cols, yrange)
       end
     end
   end
