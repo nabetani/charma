@@ -58,6 +58,17 @@ module Charma
       (ry-min) * rc.h / (max-min) + rc.bottom
     end
 
+    def draw_y_ticks(area, range, ticks)
+      h = (area.h / ticks.size) * 0.7
+      rects = ticks.map{ |v|
+        abs_y = abs_y_positoin( v, area, range )
+        Rect.new( area.x+area.w*0.1, abs_y - h/2, area.w*0.8, h )
+      }
+      n = (3..20).find{ |w| ticks.map{ |e| "%*g" % [w,e] }.uniq.size == ticks.size }
+      texts = ticks.map{ |v| "%*g " % [ n, v ] }
+      @canvas.draw_samesize_texts( rects, texts, align: :right )
+    end
+
     def draw_y_grid(area, range, ticks)
       ticks.each do |v|
         abs_y = abs_y_positoin( v, area, range )

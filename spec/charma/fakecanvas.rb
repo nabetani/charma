@@ -18,4 +18,8 @@ class FakeCanvas
   def stroke_rect(rect)
     @called << { method: :stroke_rect, args:[ rect ] }
   end
+
+  def draw_samesize_texts( rects, texts, align: :center )
+    @called << { method: :draw_samesize_texts, args:[ rects, texts, align ] }
+  end
 end

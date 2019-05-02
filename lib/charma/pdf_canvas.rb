@@ -49,7 +49,7 @@ module Charma
       pr = pdf_rect(rect)
       w = @pdf.width_of(t, size:1)
       h = @pdf.height_of(t, size:1)
-      font_size = [pr.w.to_f/w ,pr.h.to_f/h].min * 0.95
+      font_size = opts[:font_size] || [pr.w.to_f/w ,pr.h.to_f/h].min * 0.95
 
       @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
         @pdf.transparent(1) { @pdf.stroke_bounds }
@@ -60,8 +60,8 @@ module Charma
         at:[pr.x, pr.bottom],
         width:pr.w,
         height:pr.h,
-        align: :center,
-        valign: :center,
+        align: opts[:align] || :center,
+        valign: opts[:valign] || :center,
         size:font_size
       )
     end
@@ -93,6 +93,19 @@ module Charma
         @pdf.stroke{
           @pdf.rectangle( [pr.x, pr.bottom], pr.w, pr.h )
         }
+      end
+    end
+
+    def draw_samesize_texts( rects, texts, align: :center )
+      @pdf.save_graphics_state do
+        size = texts.zip(rects).map{ |txt,rc|
+          w = @pdf.width_of(txt, size:1)
+          h = @pdf.height_of(txt, size:1)
+          [rc.w.to_f/w, rc.h.to_f/h].min
+        }.min
+        texts.zip(rects).each do |txt, rc|
+          text( txt, rc, font_size:size, align:align )
+        end
       end
     end
 

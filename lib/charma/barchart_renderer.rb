@@ -46,6 +46,7 @@ module Charma
       end
       y_ticks = tick_values(:y, yrange)
       draw_y_grid(@areas.chart, yrange, y_ticks)
+      draw_y_ticks(@areas.y_tick, yrange, y_ticks)
       @canvas.stroke_rect(@areas.chart)
     end
   end
