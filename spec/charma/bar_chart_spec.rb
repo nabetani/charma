@@ -28,6 +28,22 @@ RSpec.describe Charma::BarChart do
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
+    it "will raise if series.y is NOT Array of Numeric" do
+      expect{
+        Charma::BarChart.new({series:[{y:[1]}]})
+      }.not_to raise_error
+
+      expect{
+        Charma::BarChart.new({series:[{y:[1,:a]}]})
+      }.to raise_error( Charma::Errors::InvalidOption )
+    end
+
+    it "will raise if series has unexpected key" do
+      expect{
+        Charma::BarChart.new({series:[{y:[1], unexpected:1}]})
+      }.to raise_error( Charma::Errors::InvalidOption )
+    end
+
     it "will raise unless x_ticks are Array or nil" do
       expect{
         Charma::BarChart.new({x_ticks:["a"], series:[{y:[1]}]})
