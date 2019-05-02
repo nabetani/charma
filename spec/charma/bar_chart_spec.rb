@@ -3,7 +3,22 @@
 require 'spec_helper'
 
 RSpec.describe Charma::BarChart do
-  describe "BarChart behavior" do
+  describe ".new" do
+    it "create BarChart with parameters" do
+      c = Charma::BarChart.new(
+        title:"TITLE",
+        series:[{y:[1]},{y:[2]},{y:[3]}],
+        x_ticks:%w(foo bar baz),
+        x_title:"X TITLE",
+        y_title:"Y TITLE"
+      )
+      expect(c[:title]).to eq( "TITLE" )
+      expect(c[:series]).to eq( [{y:[1]},{y:[2]},{y:[3]}] )
+      expect(c[:x_ticks]).to eq( %w(foo bar baz) )
+      expect(c[:x_title]).to eq( "X TITLE")
+      expect(c[:y_title]).to eq( "Y TITLE")
+    end
+
     it "will raise if no series" do
       expect{
         Charma::BarChart.new({})
