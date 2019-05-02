@@ -1,12 +1,20 @@
 # frozen_string_literal: true
 
 module Charma
+
+  # ドキュメントを描画するクラス。PDFRenderer などの基底クラス
   class Renderer
+
+    # Renderer を構築する
+    # pages :: ページ情報のリスト
+    # opts :: オプション
     def initialize( pages, opts )
       @pages = pages
       @opts = opts
     end
 
+    # チャートタイプに対応するチャートを描画するクラスを返す
+    # ct :: チャートタイプ
     def chart_renderer(ct)
       case ct
       when :bar_chart
@@ -16,6 +24,9 @@ module Charma
       end
     end
 
+    # ページをいい感じに分割する
+    # total :: ページの矩形
+    # count :: 何個に分割するか
     def split_page( total, count )
       xcount = (1..count ).min_by{ |w|
         h = ( count.to_r / w.to_r ).ceil
@@ -29,6 +40,10 @@ module Charma
       }.flatten
     end
 
+    # ページを描画する
+    # canvas :: 描画ターゲット
+    # page :: 描画するページの情報
+    # page_number :: ページ番号(0-origin)
     def render_page( canvas, page, page_number )
       if page.charts.empty?
         raise Errors::NothingToRender, "No chart in page ##{page_number+1}"

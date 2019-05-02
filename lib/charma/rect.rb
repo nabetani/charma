@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 module Charma
+
+  # 矩形
   Rect = Struct.new( :x, :y, :w, :h ) do
+
+    # 垂直(上下)に分割する
+    # rel_hs :: 相対的な高さのリスト
     def vsplit( *rel_hs )
       rel_sum = rel_hs.sum
       abs_y = y.to_f
@@ -13,6 +18,8 @@ module Charma
       }
     end
 
+    # 水平(左右)に分割する
+    # rel_ws :: 相対的な幅のリスト
     def hsplit( *rel_ws )
       rel_sum = rel_ws.sum
       abs_x = x.to_f
@@ -24,27 +31,33 @@ module Charma
       }
     end
 
+    # 中心の座標。x, y の順
     def center
       [cx, cy]
     end
 
+    # 中心の x 座標
     def cx
       x+w/2.0
     end
 
+    # 中心の y 座標
     def cy
       y+h/2.0
     end
 
+    # 自分を90度回した矩形。回転の中心は矩形の中心。
     def rot
       cx, cy = center
       Rect.new( cx-h/2, cy-w/2, h, w )
     end
 
+    # 右端の座標
     def right
       x+w
     end
 
+    # 下端の座標
     def bottom
       y+h
     end
