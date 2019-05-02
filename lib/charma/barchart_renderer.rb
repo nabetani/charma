@@ -46,7 +46,13 @@ module Charma
       end
       y_ticks = tick_values(:y, yrange)
       draw_y_grid(@areas.chart, yrange, y_ticks)
-      draw_y_ticks(@areas.y_tick, yrange, y_ticks)
+      draw_y_ticks(@areas.y_ticks, yrange, y_ticks)
+      draw_x_ticks(@areas.x_ticks, @chart[:x_ticks]) if @chart[:x_ticks]
+      if bottom_regend?
+        scount = @chart[:series].size
+        names = @chart[:series].map{ |e| e[:name] }
+        draw_bottom_regend(@areas.legend, names, seq_colors(scount))
+      end
       @canvas.stroke_rect(@areas.chart)
     end
   end

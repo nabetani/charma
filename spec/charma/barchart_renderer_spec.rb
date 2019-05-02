@@ -54,14 +54,14 @@ RSpec.describe Charma::BarChartRenderer do
   describe "#draw_bars" do
     it "renders bars" do
       chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }])
-      fakeCanvas = FakeCanvas.new
-      r = Charma::BarChartRenderer.new( chart, fakeCanvas, Charma::Rect.new( 0, 0, 100, 1000) )
+      fake_canvas = FakeCanvas.new
+      r = Charma::BarChartRenderer.new( chart, fake_canvas, Charma::Rect.new( 0, 0, 100, 1000) )
       ys = [10,20]
       cols = %w(001 002)
       r.draw_bars( ys, Charma::Rect.new( 0, 0, 80, 1000 ), cols, [0,100] )
-      expect( fakeCanvas.called.size ).to eq(2)
-      first = fakeCanvas.called[0]
-      second = fakeCanvas.called[1]
+      expect( fake_canvas.called.size ).to eq(2)
+      first = fake_canvas.called[0]
+      second = fake_canvas.called[1]
       expect( first[:method] ).to eq( :fill_rect )
       expect( first[:args][0].x ).to eq( 10 )
       expect( first[:args][0].w ).to eq( 30 )
@@ -104,20 +104,21 @@ RSpec.describe Charma::BarChartRenderer do
   describe "#render_chart" do
     it "renders bars ( 1 series, 3 values )" do
       chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }])
-      fakeCanvas = FakeCanvas.new
-      r = Charma::BarChartRenderer.new( chart, fakeCanvas, Charma::Rect.new( 0, 0, 100, 100) )
+      fake_canvas = FakeCanvas.new
+      r = Charma::BarChartRenderer.new( chart, fake_canvas, Charma::Rect.new( 0, 0, 100, 100) )
       r.render_chart
-      fill_rects = fakeCanvas.called.select{ |m| m[:method]==:fill_rect }
+      fill_rects = fake_canvas.called.select{ |m| m[:method]==:fill_rect }
       expect( fill_rects.size ).to eq(3)
     end
 
     it "renders bars ( 5 series, 3 values )" do
       chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }]*5)
-      fakeCanvas = FakeCanvas.new
-      r = Charma::BarChartRenderer.new( chart, fakeCanvas, Charma::Rect.new( 0, 0, 100, 100) )
+      fake_canvas = FakeCanvas.new
+      r = Charma::BarChartRenderer.new( chart, fake_canvas, Charma::Rect.new( 0, 0, 100, 100) )
       r.render_chart
-      fill_rects = fakeCanvas.called.select{ |m| m[:method]==:fill_rect }
-      expect( fill_rects.size ).to eq(15)
+      fill_rects = fake_canvas.called.select{ |m| m[:method]==:fill_rect }
+      bars = 5 * 3
+      expect( fill_rects.size ).to eq(bars)
     end
   end
 end

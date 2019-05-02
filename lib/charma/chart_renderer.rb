@@ -4,11 +4,11 @@ module Charma
   Areas = Struct.new(
     :title,
     :x_title,
-    :x_tick,
+    :x_ticks,
     :y_title,
-    :y_tick,
+    :y_ticks,
     :chart,
-    :y2_tick,
+    :y2_ticks,
     :y2_title,
     :legend
   )
@@ -111,26 +111,49 @@ module Charma
       (max-ry) * rc.h / (max-min) + rc.y
     end
 
+    def bottom_regend?
+      1 < @chart[:series].size && @chart[:series].all?{ |e| ! e[:name].nil? }
+    end
+
     def prepare_areas
       a = @areas = Areas.new
       title_h = @chart[:title] ? 1 : 0
       main_h = 10
-      legend_h = 1
-      a.title, main, a.legend = @area.vsplit( title_h, main_h, legend_h )
+      legend_h = bottom_regend? ? 1 : 0
+      a.title, main, bottom = @area.vsplit( title_h, main_h, legend_h )
       left0_w = @chart[:y_title] ? 1 : 0
       left1_w = 1
       right1_w = @chart.has_y2? ? 1 : 0
       right0_w = @chart[:y2_title] ? 1 : 0
       left0, left1, center, right1, right0 =
         main.hsplit( left0_w, left1_w, 10, right1_w, right0_w )
+      _, _, a.legend, =
+        bottom.hsplit( left0_w, left1_w, 10, right1_w, right0_w )
       chart_h = 10
-      x_tick_h = 0.7
+      x_tick_h = @chart[:x_ticks] ? 0.7 : 0
       x_title_h = @chart[:x_title] ? 1 : 0
       a.y_title, = left0.vsplit( chart_h, x_tick_h, x_title_h )
-      a.y_tick, = left1.vsplit( chart_h, x_tick_h, x_title_h )
-      a.chart, a.x_tick, a.x_title = center.vsplit( chart_h, x_tick_h, x_title_h )
-      a.y2_tick, = right1.vsplit( chart_h, x_tick_h, x_title_h )
+      a.y_ticks, = left1.vsplit( chart_h, x_tick_h, x_title_h )
+      a.chart, a.x_ticks, a.x_title = center.vsplit( chart_h, x_tick_h, x_title_h )
+      a.y2_ticks, = right1.vsplit( chart_h, x_tick_h, x_title_h )
       a.y2_title, = right0.vsplit( chart_h, x_tick_h, x_title_h )
+    end
+
+    def draw_x_ticks( area, texts )
+      rects = area.hsplit( *([1]*texts.size) ).map{ |rc|
+        rc.hsplit(1,10,1)[1]
+      }
+      @canvas.draw_samesize_texts( rects, texts, align: :center )
+    end
+
+    def draw_bottom_regend(area, names, colors)
+      rects = area.hsplit( *([1]*names.size) )
+      left_rects, _, text_rects, _ = rects.map{ |e| e.hsplit(10,1,10,2) }.transpose
+      bar_rects = left_rects.map{ |e| e.vsplit(1,1,1)[1] }
+      bar_rects.zip(colors).each do |rc, col|
+        @canvas.fill_rect( rc, col )
+      end
+      @canvas.draw_samesize_texts( text_rects, names, align: :left )
     end
 
     def render_titles

@@ -60,7 +60,10 @@ RSpec.describe Charma::Document do
       doc = Charma::Document.new
       doc.add_page do |page|
         s=Array.new(7){ |x|
-          { y: Array.new(11){ |y| 1+Math.sin((x+2)**(y+2)) } }
+          {
+            y: Array.new(11){ |y| 1+Math.sin((x+2)**(y+2)) },
+            name: "number #{x}"
+          }
         }
         page.add_chart( Charma::BarChart.new(
           series:s
