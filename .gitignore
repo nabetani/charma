@@ -7,6 +7,7 @@
 /spec/reports/
 /tmp/
 /vendor/
+/spec_output
 
 # rspec failure tracking
 .rspec_status
