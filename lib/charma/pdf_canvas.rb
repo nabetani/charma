@@ -109,19 +109,25 @@ module Charma
       end
     end
 
-    def horizontal_line( left, right, y, style: :solid, color:"000", color2:"fff" )
+    def horizontal_line( left, right, y, style: :solid, color:"000", color2:nil )
       @pdf.save_graphics_state do
         case style
         when :solid
-          @pdf.stroke_color pdf_color(color)
-          @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+          unless color.nil?
+            @pdf.stroke_color pdf_color(color)
+            @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+          end
         when :dash
-          @pdf.dash([2,2])
-          @pdf.stroke_color pdf_color(color)
-          @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
-          @pdf.dash([2,2], phase:2)
-          @pdf.stroke_color pdf_color(color2)
-          @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+          unless color.nil?
+            @pdf.dash([2,2])
+            @pdf.stroke_color pdf_color(color)
+            @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+          end
+          unless color2.nil?
+            @pdf.dash([2,2], phase:2)
+            @pdf.stroke_color pdf_color(color2)
+            @pdf.stroke_horizontal_line(left, right, at:pdf_y(y))
+          end
         else
           raise Errors::InternalError, "unexpected line style: #{style.inspect}"
         end

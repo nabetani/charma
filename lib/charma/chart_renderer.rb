@@ -70,10 +70,12 @@ module Charma
     end
 
     def draw_y_grid(area, range, ticks)
+      zero_set = [ :solid, "000" ]
+      nonzero_set = [ :dash, "888" ]
       ticks.each do |v|
+        s, c = v.zero? ? zero_set : nonzero_set
         abs_y = abs_y_positoin( v, area, range )
-        c = v.zero? ? "000" : "aaa"
-        @canvas.horizontal_line(area.x, area.right, abs_y, color:c )
+        @canvas.horizontal_line(area.x, area.right, abs_y, style:s, color:c, color2:nil)
       end
     end
 
