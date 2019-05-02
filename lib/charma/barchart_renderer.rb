@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 module Charma
+  # 棒グラフを描画する
   class BarChartRenderer < ChartRenderer
+
+    # 描画オブジェクトを生成する
     def initialize( chart, canvas, area )
       super
     end
 
+    # y の範囲を計算する
     def calc_yrange
       yvals = @chart[:series].map{ |s| s[:y] }.flatten.compact
       min, max = yvals.minmax
@@ -14,19 +18,23 @@ module Charma
       [ ymin, ymax ]
     end
 
+    # 棒を描画する
     def draw_bars( ys, rc, cols, yrange )
       ratio = 0.75
       _, bars, = rc.hsplit( (1-ratio)/2, ratio, (1-ratio)/2 )
       bar_rects = bars.hsplit(*Array.new(ys.size,1))
       bar_rects.zip(ys, cols) do |bar, y, col|
-        ay = abs_y_positoin(y, bar, yrange)
-        zero = abs_y_positoin(0, bar, yrange)
+        ay = abs_y_position(y, bar, yrange)
+        zero = abs_y_position(0, bar, yrange)
         t, b = [ ay, zero ].minmax
         rc = Rect.new( bar.x, t, bar.w, b-t )
         @canvas.fill_rect( rc, col )
       end
     end
 
+    # 色を生成する。
+    # 系列が複数の場合は系列ごとに同じ色。
+    # 系列が一つの場合はすべて別の色
     def create_colors
       scount = @chart[:series].size
       ssize = @chart[:series].map{ |s| s[:y].size }.max
@@ -37,6 +45,7 @@ module Charma
       end
     end
 
+    # チャートを描画する
     def render_chart
       yrange = calc_yrange
       y_values = @chart[:series].map{ |s| s[:y] }.transpose
@@ -48,7 +57,7 @@ module Charma
       draw_y_grid(@areas.chart, yrange, y_ticks)
       draw_y_ticks(@areas.y_ticks, yrange, y_ticks)
       draw_x_ticks(@areas.x_ticks, @chart[:x_ticks]) if @chart[:x_ticks]
-      if bottom_regend?
+      if bottom_legend?
         scount = @chart[:series].size
         names = @chart[:series].map{ |e| e[:name] }
         draw_bottom_regend(@areas.legend, names, seq_colors(scount))

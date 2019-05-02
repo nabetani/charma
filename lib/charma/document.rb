@@ -4,9 +4,10 @@ module Charma
   # Charma Document
   class Document
     # ドキュメントを生成
-    # @param [String] font デフォルトフォント名。
-    # @param [String] page_size デフォルトページサイズ。"A4" のような形式か、"210x297" のような形式。
-    # @param [Symbol] page_layout :landscape (横長) または :portlait (縦長)。
+    # font :: デフォルトフォント名。String。
+    # page_size :: デフォルトページサイズ。"A4" のような形式か、"210x297" のような形式。あるいは [100,200] のような配列
+    # page_layout :: :landscape (横長) または :portrait (縦長)。あるいは nil。
+    # ブロック引数を取り、自分を引数としたブロック呼び出しになる
     def initialize(
       font:nil,
       page_size: DEFAULT_PAGE_SIZE,
@@ -17,14 +18,18 @@ module Charma
       @pages = []
       @font = font
       @page_size = page_size
-      unless [ :landscape, :portlait, nil].include?(page_layout)
+      unless [ :landscape, :portrait, nil].include?(page_layout)
         raise Charma::Errors::InvalidOption, "#{page_layout.inspect} is not supported page_layout"
       end
       @page_layout = page_layout
       block[self] if block
     end
 
-    # ページを追加
+    # ページを追加する
+    # font :: フォント名。String。
+    # page_size :: ページサイズ。"A4" のような形式か、"210x297" のような形式。あるいは [100,200] のような配列
+    # page_layout :: :landscape (横長) または :portrait (縦長)。あるいは nil。
+    # ブロック引数を取り、作られたページを引数としたブロック呼び出しになる。
     def add_page(
       font:nil,
       page_size:nil,
@@ -36,12 +41,15 @@ module Charma
       page = Page.new(
         font:(font||@font),
         page_size:(page_size||@page_size),
-        page_layout:(page_layout||@page_layout) )
+        page_layout:(page_layout||@page_layout)
+      )
       block[page] if block
       @pages.push page
       page
     end
 
+    # ファイル名からファイルタイプ( :pdf または :svg )を得る。
+    # filename :: ファイル名。
     def filetype_from( filename )
       ext = File.extname(filename)
       case ext.downcase
@@ -54,6 +62,8 @@ module Charma
       end
     end
 
+    # ファイルタイプに応じたレンダラを返す
+    # ft :: :pdf または :svg。
     def renderer_for( ft )
       case ft
       when :pdf
@@ -65,6 +75,7 @@ module Charma
       end
     end
 
+    # PDFまたはSVGを出力する。
     def render( filename, file_type:nil )
       if @pages.empty?
         raise Errors::NothingToRender, "No page to render"

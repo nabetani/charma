@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Charma
+
+  # チャート全体の領域に名前をつけたもの
   Areas = Struct.new(
     :title,
     :x_title,
@@ -13,7 +15,13 @@ module Charma
     :legend
   )
 
+  # チャートを描画するロジックの共通部分
   class ChartRenderer
+
+    # チャートを描画するオブジェクトを生成する
+    # chart :: チャートに関する情報
+    # canvas :: チャートの描画ターゲット。PDF か SVG。
+    # area :: チャートが占める領域。Rect 型。
     def initialize( chart, canvas, area )
       @chart = chart
       @canvas = canvas
@@ -21,6 +29,9 @@ module Charma
       prepare_areas
     end
 
+    # 対数グラフに対応するために、生の値からスケール変更済みの値を求める
+    # axis :: 軸の名前。:y, :y2, :x のいずれか
+    # v :: 生の値
     def scale_value(axis, v)
       v
       # TODO: refer scale
@@ -32,11 +43,15 @@ module Charma
       # end
     end
 
+    # 対数グラフに対応するために、スケール変更済みの値から生の値を求める
+    # axis :: 軸の名前。:y, :y2, :x のいずれか
+    # v :: スケール変更済みの値
     def unscale_value( axis, v )
       v
       # TODO: refer scale
     end
 
+    # グリッドのために適当に切りの良い値を求める
     def tick_unit(v)
       base = (10**Math.log10(v).round).to_f
       man = v/base
@@ -45,6 +60,9 @@ module Charma
       base*2
     end
 
+    # グリッドに使う値のリストを求める
+    # axis :: 軸の名前。:x, :y, :y2 のいずれか
+    # range :: その軸で扱う値の範囲
     def tick_values(axis, range)
       min, max = range.minmax.map{ |e| scale_value( axis, e ) }
       unit = tick_unit((max - min) * 0.1)
@@ -53,15 +71,13 @@ module Charma
       (i_low..i_hi).map{ |i| unscale_value( axis, i*unit ) }
     end
 
-    def abs_y_positoin( v, area, range )
-      ry, min, max = [ v, *yrange ].map{ |e| scale_value(:y, e) }
-      (ry-min) * rc.h / (max-min) + rc.bottom
-    end
-
+    # y軸の値ラベル( y_ticks )を描画する
+    # area :: y_ticks を描画する領域
+    # ticks :: y_ticks に描画する値のリスト
     def draw_y_ticks(area, range, ticks)
       h = (area.h / ticks.size) * 0.7
       rects = ticks.map{ |v|
-        abs_y = abs_y_positoin( v, area, range )
+        abs_y = abs_y_position( v, area, range )
         Rect.new( area.x+area.w*0.1, abs_y - h/2, area.w*0.8, h )
       }
       n = (3..20).find{ |w| ticks.map{ |e| "%*g" % [w,e] }.uniq.size == ticks.size }
@@ -69,20 +85,29 @@ module Charma
       @canvas.draw_samesize_texts( rects, texts, align: :right )
     end
 
+    # チャート内の水平線を描画する
+    # area :: チャートの領域
+    # range :: y の値の範囲
+    # ticks :: 横線を描画する値のリスト
+    # y==0 の場合は実線、それ以外は点線を描画する
     def draw_y_grid(area, range, ticks)
       zero_set = [ :solid, "000" ]
       nonzero_set = [ :dash, "888" ]
       ticks.each do |v|
         s, c = v.zero? ? zero_set : nonzero_set
-        abs_y = abs_y_positoin( v, area, range )
+        abs_y = abs_y_position( v, area, range )
         @canvas.horizontal_line(area.x, area.right, abs_y, style:s, color:c, color2:nil)
       end
     end
 
+    # 色のリストをつくる
+    # n :: 作る色の数
+    # n<=6 の場合は、固定の色のリストから取ってくる。web color の blue, red, green など。
+    # 7<=n の場合は虹色っぽく適当に作る。
     def seq_colors(n)
       case n
       when 1..6
-        %w(00f f00 0a0 f0f fa0 0af)[0,n]
+        %w(00f f00 008000 f0f 0ff 0ff)[0,n]
       else
         f = lambda{ |t0|
           v = lambda{ |t|
@@ -101,29 +126,40 @@ module Charma
       end
     end
 
+    # 相対位置から絶対位置に変換する
+    # v :: 変換される相対位置
+    # rc :: 領域。左端が xrange[0] ,右端が xrange[1] に対応する。
+    # xrange :: 値の範囲
     def abs_x_positoin(v, rc, xrange)
       rx, min, max = [ v, *xrange ].map{ |e| scale_value(:x, e) }
       (rx-min) * rc.w / (max-min) + rc.x
     end
 
-    def abs_y_positoin(v, rc, yrange)
+    # 相対位置から絶対位置に変換する
+    # v :: 変換される相対位置
+    # rc :: 領域。上端が yrange[0] ,下端が yrange[1] に対応する。
+    # yrange :: 値の範囲
+    def abs_y_position(v, rc, yrange)
       ry, min, max = [ v, *yrange ].map{ |e| scale_value(:y, e) }
       (max-ry) * rc.h / (max-min) + rc.y
     end
 
-    def bottom_regend?
+    # 下端に legend があるかどうか
+    # 系列が複数あり、すべての系列に名前がついていれば 真
+    def bottom_legend?
       1 < @chart[:series].size && @chart[:series].all?{ |e| ! e[:name].nil? }
     end
 
+    # 領域を分割し、 @areas に格納する
     def prepare_areas
       a = @areas = Areas.new
       title_h = @chart[:title] ? 1 : 0
       main_h = 10
-      legend_h = bottom_regend? ? 1 : 0
+      legend_h = bottom_legend? ? 1 : 0
       a.title, main, bottom = @area.vsplit( title_h, main_h, legend_h )
       left0_w = @chart[:y_title] ? 1 : 0
       left1_w = 1
-      right1_w = @chart.has_y2? ? 1 : 0
+      right1_w = @chart.y2? ? 1 : 0
       right0_w = @chart[:y2_title] ? 1 : 0
       left0, left1, center, right1, right0 =
         main.hsplit( left0_w, left1_w, 10, right1_w, right0_w )
@@ -139,6 +175,9 @@ module Charma
       a.y2_title, = right0.vsplit( chart_h, x_tick_h, x_title_h )
     end
 
+    # x_ticks を描画する
+    # area :: x_ticks に使える領域
+    # texts :: x_ticks に描画する文字列のリスト
     def draw_x_ticks( area, texts )
       rects = area.hsplit( *([1]*texts.size) ).map{ |rc|
         rc.hsplit(1,10,1)[1]
@@ -146,6 +185,10 @@ module Charma
       @canvas.draw_samesize_texts( rects, texts, align: :center )
     end
 
+    # 下端に legend を描画する
+    # area :: legend を描画する領域
+    # names :: 凡例の各要素のテキスト
+    # colors :: 凡例の各要素の色
     def draw_bottom_regend(area, names, colors)
       ratio = [5,0.5,10,2]
       xcount = (1..names.size).max_by{ |w|
@@ -167,6 +210,8 @@ module Charma
       @canvas.draw_samesize_texts( text_rects, names, align: :left )
     end
 
+    # タイトルを描画する
+    # グラフタイトル、x軸タイトル、y軸タイトル、第二y軸タイトル を描画する（必要なら）
     def render_titles
       @canvas.text( @chart[:title], @areas.title ) if @chart[:title]
       @canvas.text( @chart[:x_title], @areas.x_title ) if @chart[:x_title]
@@ -174,6 +219,7 @@ module Charma
       @canvas.rottext( @chart[:y2_title], @areas.y_title, 270 ) if @chart[:y2_title]
     end
 
+    # 何もかも描画する
     def render
       render_titles
       render_chart

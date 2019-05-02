@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 module Charma
+  # デフォルトの紙
   DEFAULT_PAGE_SIZE = "A4"
 
+  # 紙の名前と大きさの対照表。実部が横幅。虚部が縦幅。
+  # TODO: Bサイズや LETTER, LEGAL などをいれる
   PAPER_SIZES = {
     A0:841.0+1189.0i,
     A1:594.0+841.0i,

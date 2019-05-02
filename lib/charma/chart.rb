@@ -3,7 +3,11 @@
 module Charma
   # チャートの基底クラス
   class Chart
-    def self.required(type, inner_type=nil)
+
+    # 必要とされるオプションであることを示すマーカー
+    # type :: 値の型
+    # inner_type :: 値の要素型。値が Array の場合などに使う。
+    def self.required(type, inner_type = nil)
       lambda do |k, v|
         raise Errors::InvalidOption, "#{k} is required" if v.nil?
         raise Errors::InvalidOption, "#{k} should be #{type}" unless v.is_a?(type)
@@ -15,7 +19,10 @@ module Charma
       end
     end
 
-    def self.nil_or(type, inner_type=nil)
+    # なくてもいいオプションであることを示すマーカー
+    # type :: 値の型
+    # inner_type :: 値の要素型。値が Array の場合などに使う。
+    def self.nil_or(type, inner_type = nil)
       lambda do |k, v|
         return if v.nil?
         raise Errors::InvalidOption, "#{k} should be #{type}" unless v.is_a?(type)
@@ -27,14 +34,18 @@ module Charma
       end
     end
 
+    # Chart を構築する
+    # opts :: オプションを示す Hash。
     def initialize(opts)
       @opts = opts
     end
 
-    def has_y2?
+    # 第二y軸があるかどうか。ある場合は true。
+    def y2?
       false
     end
 
+    # オプションへのアクセサ
     def [](key)
       @opts[key]
     end

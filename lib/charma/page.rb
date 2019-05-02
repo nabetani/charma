@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
 module Charma
-  # Charma Page
+  # Charma の Page 情報
   class Page
+
+    # Page を構築する
+    # font :: フォント名。String または nil。
+    # page_size :: デフォルトページサイズ。"A4" のような形式か、"210x297" のような形式。あるいは [100,200] のような配列
+    # page_layout :: :landscape (横長) または :portrait (縦長)。あるいは nil。
+    # ブロック引数を取り、自分を引数としたブロック呼び出しになる
     def initialize(
       font:nil,
       page_size:DEFAULT_PAGE_SIZE,
@@ -15,10 +21,18 @@ module Charma
       block[self] if block
     end
 
+    # ページサイズ。複素数。実部が横幅。虚部が縦幅。
     attr_reader :size
+
+    # ページ内のチャートのリスト
     attr_reader :charts
+
+    # フォント
     attr_reader :font
 
+    # ページサイズを計算する
+    # size :: ページサイズ。page_layout が nil の場合、実部が横幅。虚部が縦幅。
+    # page_layout :: :landscape または :portrait または nil
     def adjust_layout(size, page_layout)
       s,l = size.rectangular.minmax
       case page_layout
@@ -33,6 +47,9 @@ module Charma
       end
     end
 
+    # 紙のサイズを示す入力を、紙のサイズを示す複素数に変換する
+    # page_size :: "A4" だったり "200x300" だったり [100,200] だったりするもの
+    # page_layout :: :landscape または :portrait または nil
     def parse_papersize( page_size, page_layout )
       case page_size
       when /^[AB]\d+$/
@@ -50,14 +67,17 @@ module Charma
       end
     end
 
+    # ページの幅
     def w
       size.real
     end
 
+    # ページの高さ
     def h
       size.imag
     end
 
+    # チャートを追加する
     def add_chart( chart )
       @charts.push chart
     end
