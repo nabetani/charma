@@ -52,7 +52,11 @@ module Charma
     def create_colors
       scount = @chart[:series].size
       ssize = @chart[:series].map{ |s| s[:y].size }.max
+      if scount==1
+        seq_colors(ssize).map{ |e| [e] }
+      else
       [seq_colors(scount)] * ssize
+    end
     end
 
     def render_chart
