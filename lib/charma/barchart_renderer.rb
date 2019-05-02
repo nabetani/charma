@@ -27,28 +27,6 @@ module Charma
       end
     end
 
-    def seq_colors(n)
-      case n
-      when 1..6
-        %w(00f f00 0a0 f0f fa0 0af)[0,n]
-      else
-        f = lambda{ |t0|
-          v = lambda{ |t|
-            case t
-            when 0..1 then t
-            when 1..2 then 2-t
-            else 0
-            end
-          }[t0 % 3]
-          "%02x" % (v**0.5*255).round
-        }
-        Array.new(n){ |i|
-          t = i*3.0/n+2
-          [f[t],f[t+1],f[t+2]].join
-        }
-      end
-    end
-
     def create_colors
       scount = @chart[:series].size
       ssize = @chart[:series].map{ |s| s[:y].size }.max
