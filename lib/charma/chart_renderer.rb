@@ -147,7 +147,7 @@ module Charma
     end
 
     def draw_bottom_regend(area, names, colors)
-      ratio = [10,0.5,10,2]
+      ratio = [5,0.5,10,2]
       xcount = (1..names.size).max_by{ |w|
         h = ( names.size.to_r / w.to_r ).ceil
         cw = area.w.to_f / w * ratio[2] / ratio.sum
