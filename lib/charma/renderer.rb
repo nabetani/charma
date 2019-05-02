@@ -29,7 +29,10 @@ module Charma
       }.flatten
     end
 
-    def render_page( canvas, page )
+    def render_page( canvas, page, page_number )
+      if page.charts.empty?
+        raise Errors::NothingToRender, "No chart in page ##{page_number+1}"
+      end
       rects = split_page( canvas.page_rect, page.charts.size )
       page.charts.zip(rects).each do |chart, rect|
         t = chart_renderer(chart.chart_type)

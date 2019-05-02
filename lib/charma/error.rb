@@ -7,5 +7,7 @@ module Charma
     class InvalidPageSize < Error; end
     class InvalidPageLayout < Error; end
     class InvalidOption < Error; end
+    class InvalidFileType < Error; end
+    class NothingToRender < Error; end
   end
 end
