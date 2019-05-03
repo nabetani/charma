@@ -51,5 +51,5 @@ page.add_chart( chart )
 
 ```ruby
 doc.render( "hoge.pdf" ) # PDF を出力
-doc.render( "fuga.svg" ) # SVG を出力
+doc.render( "fuga.svg" ) # SVG を出力(対応予定)
 ```
