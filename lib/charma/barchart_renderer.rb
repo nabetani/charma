@@ -10,6 +10,7 @@ module Charma
     end
 
     # y の範囲を計算する
+    # axis :: 軸。:y または :y2 。
     def calc_yrange(axis)
       yvals = @chart[:series].map{ |s| s[axis] }.flatten.compact
       return nil if yvals.empty?
@@ -22,6 +23,11 @@ module Charma
     end
     
     # 棒を描画する
+    # ys :: y の値のリスト。ys[0] が最初の系列の y の値。
+    # rc :: 一連のバーを含む矩形
+    # cols :: 色のリスト。cols[0] が最初の系列の色。
+    # yrange :: 第一y軸の値の範囲。
+    # y2range :: 第二y軸の値の範囲。
     def draw_bars( ys, rc, cols, yrange, y2range )
       ratio = 0.75
       _, bars, = rc.hsplit( (1-ratio)/2, ratio, (1-ratio)/2 )
