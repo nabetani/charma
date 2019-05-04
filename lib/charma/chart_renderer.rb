@@ -29,26 +29,44 @@ module Charma
       prepare_areas
     end
 
+    def scale_type(axis)
+      case axis
+      when :x
+        @chart[:x_scale] || :linear
+      when :y
+        @chart[:y_scale] || :linear
+      when :y2
+        @chart[:y2_scale] || :linear
+      else
+        raise Errors::LogicError, "unexpected axis: #{axis.inspect}"
+      end
+    end
+
     # 対数グラフに対応するために、生の値からスケール変更済みの値を求める
     # axis :: 軸の名前。:y, :y2, :x のいずれか
     # v :: 生の値
     def scale_value(axis, v)
-      v
-      # TODO: refer scale
-      # case scale_type(axis)
-      # when :log10
-      #   Math.log10(v)
-      # else
-      #   v
-      # end
+      case scale_type(axis)
+      when :log10
+        p [ axis, v, Math.log10(v) ]
+        Math.log10(v)
+      when :linear
+        v
+      else
+        raise Errors::LogicError, "unexpected scale type: #{scale_type(axis).inspect}"
+      end
     end
 
     # 対数グラフに対応するために、スケール変更済みの値から生の値を求める
     # axis :: 軸の名前。:y, :y2, :x のいずれか
     # v :: スケール変更済みの値
     def unscale_value( axis, v )
-      v
-      # TODO: refer scale
+      case scale_type(axis)
+      when :log10
+        10**v
+      else
+        v
+      end
     end
 
     # グリッドのために適当に切りの良い値を求める
@@ -216,7 +234,7 @@ module Charma
       @canvas.text( @chart[:title], @areas.title ) if @chart[:title]
       @canvas.text( @chart[:x_title], @areas.x_title ) if @chart[:x_title]
       @canvas.rottext( @chart[:y_title], @areas.y_title, 90 ) if @chart[:y_title]
-      @canvas.rottext( @chart[:y2_title], @areas.y_title, 270 ) if @chart[:y2_title]
+      @canvas.rottext( @chart[:y2_title], @areas.y2_title, 270 ) if @chart[:y2_title]
     end
 
     # 何もかも描画する

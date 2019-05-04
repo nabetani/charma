@@ -19,5 +19,8 @@ module Charma
 
     # 出力するものがない。ページがないとか、ページ内にチャートがないとか。
     class NothingToRender < Error; end
+
+    # 発生するとしたらバグ、というエラー。
+    class LogicError < Error; end
   end
 end

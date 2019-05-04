@@ -34,6 +34,15 @@ module Charma
       end
     end
 
+    # 引数の値のいずれかである必要があることを示すマーカー
+    # args 値の候補
+    def self.one_of( *args )
+      lambda do |k, v|
+        okay = args.include?(v)
+        raise Errors::InvalidOption, "#{k} should be one of #{args.join(', ')}" unless okay
+      end
+    end
+
     # Chart を構築する
     # opts :: オプションを示す Hash。
     def initialize(opts)
@@ -42,7 +51,7 @@ module Charma
 
     # 第二y軸があるかどうか。ある場合は true。
     def y2?
-      false
+      !! @opts[:series].any?{ |e| e[:y2] }
     end
 
     # オプションへのアクセサ

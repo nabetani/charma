@@ -9,12 +9,16 @@ module Charma
       series:required(Array, Hash),
       x_ticks:nil_or(Array),
       x_title:nil,
-      y_title:nil
+      y_title:nil,
+      y2_title:nil
+      # y_scale:one_of( nil, :linear, :log10 ) 棒グラフに対数目盛は不適切なので対応しない
+      # y2_scale:one_of( nil, :linear, :log10 ) 棒グラフに対数目盛は不適切なので対応しない
     }.freeze
 
     # 系列につけられるオプション
     SERIES_OPTIONS = {
-      y:required(Array, Numeric),
+      y:nil_or(Array, Numeric),
+      y2:nil_or(Array, Numeric),
       name:nil
     }.freeze
 
@@ -27,7 +31,8 @@ module Charma
     #
     # 系列は Hash の Array になっている。
     # Hash のキーと値は以下の通り：
-    # :y :: yの値。数値の配列。
+    # :y :: yの値のリスト。数値の配列。左側のy軸を利用
+    # :y2 :: yの値のリスト。数値の配列。右側のy軸を利用
     # :name :: 系列の名前(凡例に使う)
     def initialize(opts)
       opts.each do |k,v|
@@ -52,6 +57,8 @@ module Charma
           validator = SERIES_OPTIONS[k]
           validator[k,v] if validator
         end
+        raise Errors::InvalidOption, "either y or y2 is required" unless s[:y] || s[:y2]
+        raise Errors::InvalidOption, "You can not specify both y and y2" if s[:y] && s[:y2]
       end
     end
 
