@@ -36,7 +36,7 @@ RSpec.describe Charma::Document do
         doc.render( "hoge.docx" )
       }.to raise_error( Charma::Errors::InvalidFileType )
       expect{
-        doc.render( "hoge.docx", file_type: :docx )
+        doc.render( "hoge.pdf", file_type: :docx )
       }.to raise_error( Charma::Errors::InvalidFileType )
     end
     it "raises if no page" do
@@ -51,26 +51,6 @@ RSpec.describe Charma::Document do
       expect{
         doc.render( "hoge.pdf" )
       }.to raise_error( Charma::Errors::NothingToRender )
-    end
-    it "renders PDF" do
-      pdf_fn = "#{SPEC_OUTPUT_DIR}/hoge.pdf"
-      File.delete( pdf_fn ) if File.exist?( pdf_fn )
-      FileUtils.mkdir_p( File.split(pdf_fn).first )
-      expect( File.exist?( pdf_fn ) ).to be false
-      doc = Charma::Document.new
-      doc.add_page do |page|
-        s=Array.new(7){ |x|
-          {
-            y: Array.new(11){ |y| 1+Math.sin((x+2)**(y+2)) },
-            name: "number #{x}"
-          }
-        }
-        page.add_chart( Charma::BarChart.new(
-          series:s
-        ))
-      end
-      doc.render( pdf_fn )
-      expect( File.exist?( pdf_fn ) ).to be true
     end
   end
 end

@@ -17,3 +17,9 @@ RSpec.configure do |config|
 end
 
 SPEC_OUTPUT_DIR = "spec_output"
+
+def makepath(example, ext )
+  body = example.full_description.gsub( /\W+/, "_" )
+  body.gsub!( /(^_+)|(_+$)/, "" )
+  File.join( SPEC_OUTPUT_DIR, body+ext )
+end
