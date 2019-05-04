@@ -78,6 +78,33 @@ RSpec.describe Charma::BarChartRenderer do
     end
   end
 
+  describe "#draw_bars with y2" do
+    it "renders bars" do
+      chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }, { y2:[9, 8, 7] }])
+      fake_canvas = FakeCanvas.new
+      area = Charma::Rect.new( 0, 0, 100, 1000)
+      r = Charma::BarChartRenderer.new( chart, fake_canvas, area )
+      ys = [10,200]
+      cols = %w(001 002)
+      r.draw_bars( ys, Charma::Rect.new( 0, 0, 80, 1000 ), cols, [0,100], [0,1000] )
+      expect( fake_canvas.called.size ).to eq(2)
+      first = fake_canvas.called[0]
+      second = fake_canvas.called[1]
+      expect( first[:method] ).to eq( :fill_rect )
+      expect( first[:args][0].x ).to eq( 10 )
+      expect( first[:args][0].w ).to eq( 30 )
+      expect( first[:args][0].y ).to eq( 900 )
+      expect( first[:args][0].h ).to eq( 100 )
+      expect( first[:args][1] ).to eq( "001" )
+      expect( second[:method] ).to eq( :fill_rect )
+      expect( second[:args][0].x ).to eq( 40 )
+      expect( second[:args][0].w ).to eq( 30 )
+      expect( second[:args][0].y ).to eq( 800 )
+      expect( second[:args][0].h ).to eq( 200 )
+      expect( second[:args][1] ).to eq( "002" )
+    end
+  end
+
   describe "#create_colors" do
     it "creates colors for single series" do
       chart = Charma::BarChart.new(series:series(1,4))
