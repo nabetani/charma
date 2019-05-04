@@ -76,7 +76,7 @@ RSpec.describe :BarChartSamples do
         y2_title: ix[3].zero? ? "y2 title ##{ix}" : nil,
         series: [
           {y:[*1..(ix+2)]},
-          {y2:[*1..(ix+2)].map{ |e| -e*100 }},
+          {y2:[*1..(ix+2)].map{ |e| e*100 }},
         ]
       )
     end
