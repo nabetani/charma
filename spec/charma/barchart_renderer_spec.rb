@@ -31,22 +31,22 @@ RSpec.describe Charma::BarChartRenderer do
       range = r.calc_yrange(:y)
       expect( range.size ).to eq(2)
       expect( range[0] ).to eq(0)
-      expect( range[1] ).to eq(11)
+      expect( range[1] ).to eq(10.99)
     end
     it "create negative and positive range if there are positive and negative values" do
       chart = Charma::BarChart.new(series:[{ y:[3, -10, 20] }])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
       range = r.calc_yrange(:y)
       expect( range.size ).to eq(2)
-      expect( range[0] ).to eq(-11)
-      expect( range[1] ).to eq(22)
+      expect( range[0] ).to eq(-10*1.099)
+      expect( range[1] ).to eq(20*1.099)
     end
     it "create negative and zero range if all values are negative" do
       chart = Charma::BarChart.new(series:[{ y:[-3, -30, -20] }])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
       range = r.calc_yrange(:y)
       expect( range.size ).to eq(2)
-      expect( range[0] ).to eq(-33)
+      expect( range[0] ).to eq(-30*1.099)
       expect( range[1] ).to eq(0)
     end
   end

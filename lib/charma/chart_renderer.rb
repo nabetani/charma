@@ -9,9 +9,11 @@ module Charma
     :x_ticks,
     :y_title,
     :y_ticks,
+    :y_marks,
     :chart,
     :y2_ticks,
     :y2_title,
+    :y2_marks,
     :legend
   )
 
@@ -118,6 +120,18 @@ module Charma
       end
     end
 
+    # チャートの左右の縁にある水平線(マーク)を描画する
+    # area :: マークの領域
+    # range :: y の値の範囲
+    # ticks :: 横線を描画する値のリスト
+    def draw_y_marks(area, range, ticks)
+      opts = {style: :solid, color:"000"}
+      ticks.each do |v|
+        abs_y = abs_y_position( v, area, range )
+        @canvas.horizontal_line(area.x, area.right, abs_y, **opts)
+      end
+    end
+
     # 色のリストをつくる
     # n :: 作る色の数
     # n<=6 の場合は、固定の色のリストから取ってくる。
@@ -178,19 +192,25 @@ module Charma
       left0_w = @chart[:y_title] ? 1 : 0
       left1_w = 1
       right1_w = @chart.y2? ? 1 : 0
+      mark_w = 0.15
+      right_mark_w = @chart.y2? ? mark_w : 0
       right0_w = @chart[:y2_title] ? 1 : 0
-      left0, left1, center, right1, right0 =
-        main.hsplit( left0_w, left1_w, 10, right1_w, right0_w )
-      _, _, a.legend, =
-        bottom.hsplit( left0_w, left1_w, 10, right1_w, right0_w )
+      hsplit_ratio = [left0_w, left1_w, mark_w, 10, right_mark_w, right1_w, right0_w]
+      left0, left1, left2, center, right2, right1, right0 =
+        main.hsplit( *hsplit_ratio )
+      _, _, _, a.legend, =
+        bottom.hsplit( *hsplit_ratio )
       chart_h = 10
       x_tick_h = @chart[:x_ticks] ? 0.7 : 0
       x_title_h = @chart[:x_title] ? 1 : 0
-      a.y_title, = left0.vsplit( chart_h, x_tick_h, x_title_h )
-      a.y_ticks, = left1.vsplit( chart_h, x_tick_h, x_title_h )
-      a.chart, a.x_ticks, a.x_title = center.vsplit( chart_h, x_tick_h, x_title_h )
-      a.y2_ticks, = right1.vsplit( chart_h, x_tick_h, x_title_h )
-      a.y2_title, = right0.vsplit( chart_h, x_tick_h, x_title_h )
+      vsplit_ratio = [chart_h, x_tick_h, x_title_h]
+      a.y_title, = left0.vsplit( *vsplit_ratio )
+      a.y_ticks, = left1.vsplit( *vsplit_ratio )
+      a.y_marks, = left2.vsplit( *vsplit_ratio )
+      a.chart, a.x_ticks, a.x_title = center.vsplit( *vsplit_ratio )
+      a.y2_ticks, = right1.vsplit( *vsplit_ratio )
+      a.y2_title, = right0.vsplit( *vsplit_ratio )
+      a.y2_marks, = right2.vsplit( *vsplit_ratio )
     end
 
     # x_ticks を描画する

@@ -14,8 +14,10 @@ module Charma
       yvals = @chart[:series].map{ |s| s[axis] }.flatten.compact
       return nil if yvals.empty?
       min, max = yvals.minmax.map{ |e| scale_value( axis, e ) }
-      ymin = [0, min * 1.1].min
-      ymax = [0, max * 1.1].max
+      # 1.1 にすると、0〜1 のグラフの上端の目盛りが 1.1 になってしまうので、1.099 にする
+      ratio = 1.099
+      ymin = [0, min * ratio].min
+      ymax = [0, max * ratio].max
       [ ymin, ymax ].map{ |e| unscale_value(axis, e) }
     end
     
@@ -60,9 +62,11 @@ module Charma
       y_ticks = tick_values(:y, yrange)
       draw_y_grid(@areas.chart, yrange, y_ticks)
       draw_y_ticks(@areas.y_ticks, yrange, y_ticks)
+      draw_y_marks(@areas.y_marks, yrange, y_ticks)
       if @chart.y2?
         y2_ticks = tick_values(:y2, y2range)
         draw_y_ticks(@areas.y2_ticks, y2range, y2_ticks)
+        draw_y_marks(@areas.y2_marks, y2range, y2_ticks)
       end
       draw_x_ticks(@areas.x_ticks, @chart[:x_ticks]) if @chart[:x_ticks]
       if bottom_legend?
