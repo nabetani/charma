@@ -50,16 +50,18 @@ module Charma
 
     # 系列の値を確認する。受け入れられない場合は例外。
     def validate_series(ss)
-      raise Errors::InvalidOption, "series should not be empty" if ss.empty?
+      raise Errors::InvalidOption, "Series should not be empty" if ss.empty?
       ss.each do |s|
         s.each do |k,v|
           raise Errors::InvalidOption, "#{k.inspect} in series is not valid key" unless SERIES_OPTIONS.has_key?(k)
           validator = SERIES_OPTIONS[k]
           validator[k,v] if validator
         end
-        raise Errors::InvalidOption, "either y or y2 is required" unless s[:y] || s[:y2]
+        raise Errors::InvalidOption, "Either y or y2 is required" unless s[:y] || s[:y2]
         raise Errors::InvalidOption, "You can not specify both y and y2" if s[:y] && s[:y2]
       end
+      no_y = ss.none?{ |s| !!s[:y] }
+      raise Errors::InvalidOption, "At least one series has y" if no_y
     end
 
     # チャートの種別を返す

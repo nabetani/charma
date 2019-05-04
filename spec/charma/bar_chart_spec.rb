@@ -7,13 +7,13 @@ RSpec.describe Charma::BarChart do
     it "create BarChart with parameters" do
       c = Charma::BarChart.new(
         title:"TITLE",
-        series:[{y:[1]},{y:[2]},{y:[3]}],
+        series:[{y:[1]},{y:[2]},{y2:[3]}],
         x_ticks:%w(foo bar baz),
         x_title:"X TITLE",
         y_title:"Y TITLE"
       )
       expect(c[:title]).to eq( "TITLE" )
-      expect(c[:series]).to eq( [{y:[1]},{y:[2]},{y:[3]}] )
+      expect(c[:series]).to eq( [{y:[1]},{y:[2]},{y2:[3]}] )
       expect(c[:x_ticks]).to eq( %w(foo bar baz) )
       expect(c[:x_title]).to eq( "X TITLE")
       expect(c[:y_title]).to eq( "Y TITLE")
@@ -50,6 +50,28 @@ RSpec.describe Charma::BarChart do
 
       expect{
         Charma::BarChart.new({series:[{y:[1,:a]}]})
+      }.to raise_error( Charma::Errors::InvalidOption )
+    end
+
+    it "will raise if series.y2 is NOT Array of Numeric" do
+      expect{
+        Charma::BarChart.new({series:[{y:[1]}, {y2:[1]}]})
+      }.not_to raise_error
+
+      expect{
+        Charma::BarChart.new({series:[{y:[1]}, {y2:[1,:a]}]})
+      }.to raise_error( Charma::Errors::InvalidOption )
+    end
+
+    it "will raise if a series has both y and y2" do
+      expect{
+        Charma::BarChart.new({series:[{y:[2], y2:[1]}]})
+      }.to raise_error( Charma::Errors::InvalidOption )
+    end
+
+    it "will raise if no series has y" do
+      expect{
+        Charma::BarChart.new({series:[{y2:[1]}, {y2:[1]}]})
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
