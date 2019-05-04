@@ -120,12 +120,12 @@ module Charma
 
     # 色のリストをつくる
     # n :: 作る色の数
-    # n<=6 の場合は、固定の色のリストから取ってくる。web color の blue, red, green など。
+    # n<=6 の場合は、固定の色のリストから取ってくる。
     # 7<=n の場合は虹色っぽく適当に作る。
     def seq_colors(n)
       case n
       when 1..6
-        %w(00f f00 008000 f0f 0ff 0ff)[0,n]
+        %w(00f f00 008000 f0f 0ee cc0)[0,n]
       else
         f = lambda{ |t0|
           v = lambda{ |t|
