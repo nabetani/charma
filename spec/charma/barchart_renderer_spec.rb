@@ -28,7 +28,7 @@ RSpec.describe Charma::BarChartRenderer do
     it "create zero and positive range if all values are positive" do
       chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
-      range = r.calc_yrange
+      range = r.calc_yrange(:y)
       expect( range.size ).to eq(2)
       expect( range[0] ).to eq(0)
       expect( range[1] ).to eq(11)
@@ -36,7 +36,7 @@ RSpec.describe Charma::BarChartRenderer do
     it "create negative and positive range if there are positive and negative values" do
       chart = Charma::BarChart.new(series:[{ y:[3, -10, 20] }])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
-      range = r.calc_yrange
+      range = r.calc_yrange(:y)
       expect( range.size ).to eq(2)
       expect( range[0] ).to eq(-11)
       expect( range[1] ).to eq(22)
@@ -44,7 +44,7 @@ RSpec.describe Charma::BarChartRenderer do
     it "create negative and zero range if all values are negative" do
       chart = Charma::BarChart.new(series:[{ y:[-3, -30, -20] }])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
-      range = r.calc_yrange
+      range = r.calc_yrange(:y)
       expect( range.size ).to eq(2)
       expect( range[0] ).to eq(-33)
       expect( range[1] ).to eq(0)
@@ -53,12 +53,13 @@ RSpec.describe Charma::BarChartRenderer do
 
   describe "#draw_bars" do
     it "renders bars" do
-      chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }])
+      chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }, { y:[9, 8, 7] }])
       fake_canvas = FakeCanvas.new
-      r = Charma::BarChartRenderer.new( chart, fake_canvas, Charma::Rect.new( 0, 0, 100, 1000) )
+      area = Charma::Rect.new( 0, 0, 100, 1000)
+      r = Charma::BarChartRenderer.new( chart, fake_canvas, area )
       ys = [10,20]
       cols = %w(001 002)
-      r.draw_bars( ys, Charma::Rect.new( 0, 0, 80, 1000 ), cols, [0,100] )
+      r.draw_bars( ys, Charma::Rect.new( 0, 0, 80, 1000 ), cols, [0,100], [0,100] )
       expect( fake_canvas.called.size ).to eq(2)
       first = fake_canvas.called[0]
       second = fake_canvas.called[1]

@@ -12,6 +12,7 @@ module Charma
     # y の範囲を計算する
     def calc_yrange(axis)
       yvals = @chart[:series].map{ |s| s[axis] }.flatten.compact
+      return nil if yvals.empty?
       min, max = yvals.minmax.map{ |e| scale_value( axis, e ) }
       ymin = [0, min * 1.1].min
       ymax = [0, max * 1.1].max
