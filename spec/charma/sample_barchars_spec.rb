@@ -66,6 +66,61 @@ RSpec.describe :BarChartSamples do
     expect( File.exist?( path ) ).to be true
   end
 
+  it "with y2" do |example|
+    path = makepath(example, ".pdf" )
+    charts = [
+      Charma::BarChart.new(
+        series:[
+          { name:"y-first", y:[1,2,3,4] },
+          { name:"y-second", y:[4,3,2,1] },
+          { name:"y2-first", y2:[50,60,70,80] },
+          { name:"y2-second", y2:[90,80,70,60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        series:[
+          { name:"y-first", y:[1,2,3,-4] },
+          { name:"y-second", y:[4,3,2,1] },
+          { name:"y2-first", y2:[-50,60,70,80] },
+          { name:"y2-second", y2:[90,80,70,60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        series:[
+          { name:"y-first", y:[-1,-2,-3,-4] },
+          { name:"y-second", y:[4,3,2,1] },
+          { name:"y2-first", y2:[50,60,70,80] },
+          { name:"y2-second", y2:[90,80,70,60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        series:[
+          { name:"y-first", y:[-1,-2,-3,-4] },
+          { name:"y-second", y:[-4,-3,-2,-1] },
+          { name:"y2-first", y2:[50,60,70,80] },
+          { name:"y2-second", y2:[90,80,70,60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        series:[
+          { name:"y-first", y:[1,2,3,4] },
+          { name:"y-second", y:[4,3,2,1] },
+          { name:"y2-first", y2:[-50,-60,-70,-80] },
+          { name:"y2-second", y2:[-90,-80,-70,-60] },
+        ]
+      )
+    ]
+    Charma::Document.new do |doc|
+      doc.add_page do |page|
+        charts.each do |chart|
+          page.add_chart(chart)
+        end
+      end
+      doc.render( path )
+      expect( File.exist?( path ) ).to be true
+    end
+  end
+
   it "with titles" do |example|
     path = makepath(example, ".pdf" )
     charts = Array.new(16) do |ix|
