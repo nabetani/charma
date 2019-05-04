@@ -51,7 +51,7 @@ module Charma
       rects = split_page( canvas.page_rect, page.charts.size )
       page.charts.zip(rects).each do |chart, rect|
         t = chart_renderer(chart.chart_type)
-        t.new( chart, canvas, rect ).render
+        t.new( chart, canvas, rect.reduce(0.1) ).render
       end
     end
   end

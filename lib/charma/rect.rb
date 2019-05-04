@@ -31,6 +31,13 @@ module Charma
       }
     end
 
+    # 自分を縮小した矩形を返す。中心を維持して、上下左右から同じ長さを減じる。
+    # ratio :: 縮小する割合。0.1 とかを想定。
+    def reduce( ratio )
+      len = [w,h].min*ratio/2
+      Rect.new( x+len, y+len, w-len*2, h-len*2 )
+    end
+
     # 中心の座標。x, y の順
     def center
       [cx, cy]
