@@ -31,7 +31,6 @@ module RSpec
         private
 
         def same_size?
-          binding.pry
           @actual.respond_to?( :size ) && @actual.size == @expected.size
         end
 
