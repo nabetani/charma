@@ -9,17 +9,35 @@ module Charma
       super
     end
 
-    # y の範囲を計算する
-    # axis :: 軸。:y または :y2 。
-    def calc_yrange(axis)
-      yvals = @chart[:series].map{ |s| s[axis] }.flatten.compact
-      return nil if yvals.empty?
-      min, max = yvals.minmax.map{ |e| scale_value( axis, e ) }
+    def make_simple_range( r )
+      if r && r.min<0 && r.max<=0
+        [-1,0]
+      else
+        [0,1]
+      end
+    end
+
+    # y と y2 の範囲を計算する
+    # 返戻値の第一要素が yの範囲。第二要素が y2の範囲。y2 がない場合はnil
+    # ※ 対数目盛に対応しないので、scale / unscale 不要
+    # ※ y と y2 の y==0 の描画座標が等しくなるようにする
+    def calc_yranges
+      vals = %i(y y2).map{ |sym|
+        v = @chart[:series].map{ |s| s[sym] }.flatten.compact
+        v.empty? ? nil : (v+[0]).minmax
+      }
       # 1.1 にすると、0〜1 のグラフの上端の目盛りが 1.1 になってしまうので、1.099 にする
-      ratio = 1.099
-      ymin = [0, min * ratio].min
-      ymax = [0, max * ratio].max
-      [ ymin, ymax ].map{ |e| unscale_value(axis, e) }
+      expansion = 1.099
+      vals[0] = make_simple_range(vals[1]) if vals[0]==[0,0]
+      vals[1] = make_simple_range(vals[0]) if vals[1]==[0,0]
+      unless vals[1]
+        return [ vals[0].map{ |e| e*expansion }, nil ]
+      end
+      lens = vals.map{ |e| e.max - e.min }
+      ratio = lens[0].to_f / lens[1]
+      valranges = vals.zip( [1,ratio] ).map{ |v,r| v.map{ |e| e*r } }
+      range = valranges.flatten.minmax.map{ |e| e*expansion }
+      area_ranges = [1,1/ratio].map{ |r| range.map{ |e| e*r } }
     end
     
     # 棒を描画する
@@ -58,8 +76,7 @@ module Charma
 
     # チャートを描画する
     def render_chart
-      yrange = calc_yrange(:y)
-      y2range = calc_yrange(:y2)
+      yrange, y2range = calc_yranges
       y_values = @chart[:series].map{ |s| s[:y]||s[:y2] }.compact.transpose
       bar_areas = @areas.chart.hsplit(*Array.new(y_values.size,1))
       y_values.zip(bar_areas, create_colors).each do |ys, rc, cols|

@@ -24,30 +24,92 @@ RSpec.describe Charma::BarChartRenderer do
     end
   end
 
-  describe "#calc_yrange" do
-    it "create zero and positive range if all values are positive" do
+  describe "#calc_yranges" do
+    it "creates zero and positive range if all values are positive" do
       chart = Charma::BarChart.new(series:[{ y:[3, 10, 5] }])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
-      range = r.calc_yrange(:y)
-      expect( range.size ).to eq(2)
-      expect( range[0] ).to eq(0)
-      expect( range[1] ).to eq(10.99)
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to almost_eq_ary( [0, 10].map{ |e| e*1.099 }, 1e-7 )
+      expect( y2range ).to be_nil
     end
-    it "create negative and positive range if there are positive and negative values" do
-      chart = Charma::BarChart.new(series:[{ y:[3, -10, 20] }])
+
+    it "creates 0 to 1 range if all the values are zero" do
+      chart = Charma::BarChart.new(series:[{ y:[0,0,0] }])
+      r = Charma::BarChartRenderer.new(chart, nil, Charma::Rect.new( 0, 0, 1, 1))
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to eq([0,1.099])
+      expect( y2range ).to be_nil
+    end
+
+    it "creates 0 to 1 range if all the values are zero(with y2)" do
+      chart = Charma::BarChart.new(series:[{ y:[0,0,0] }, { y2:[0,0,0] }])
+      r = Charma::BarChartRenderer.new(chart, nil, Charma::Rect.new( 0, 0, 1, 1))
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to eq([0,1].map{ |e| e*1.099})
+      expect( y2range ).to eq([0,1].map{ |e| e*1.099})
+    end
+
+    it "creates -1 to 0 range if another values are negative(y)" do
+      chart = Charma::BarChart.new(series:[{ y:[0,0,0] }, { y2:[-10,-100,-1000] }])
+      r = Charma::BarChartRenderer.new(chart, nil, Charma::Rect.new( 0, 0, 1, 1))
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to almost_eq_ary([-1,0].map{ |e| e*1.099}, 1e-7)
+      expect( y2range ).to almost_eq_ary([-1099,0], 1e-7)
+    end
+
+    it "creates -0.25 to 0.75 range if another values are negative and positive" do
+      chart = Charma::BarChart.new(series:[{ y:[0,0] }, { y2:[-25, 75] }])
+      r = Charma::BarChartRenderer.new(chart, nil, Charma::Rect.new( 0, 0, 1, 1))
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to almost_eq_ary([-0.25, 1].map{ |e| e*1.099}, 1e-7)
+      expect( y2range ).to almost_eq_ary([-25, 100].map{ |e| e*1.099}, 1e-7 )
+    end
+
+    it "creates 0 to -1 range if another values are negative(y2)" do
+      chart = Charma::BarChart.new(series:[{ y:[-1,-10,-100] }, { y2:[0,0,0] }])
+      r = Charma::BarChartRenderer.new(chart, nil, Charma::Rect.new( 0, 0, 1, 1))
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to almost_eq_ary([-109.9,0], 1e-7)
+      expect( y2range ).to almost_eq_ary([-1.099,0], 1e-7)
+    end
+
+    it "creates -1.099 to 1.099 and -10.99 to 10.99 ranges" do
+      y = { y:[-1, 0, -0.5] }
+      y2 = { y2:[1, 10, 7] }
+      chart = Charma::BarChart.new(series:[y, y2])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
-      range = r.calc_yrange(:y)
-      expect( range.size ).to eq(2)
-      expect( range[0] ).to eq(-10*1.099)
-      expect( range[1] ).to eq(20*1.099)
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to eq([-1.099, 1.099])
+      expect( y2range ).to eq([-10.99, 10.99])
     end
-    it "create negative and zero range if all values are negative" do
+
+    it "creates negative and zero range if all the values are negative" do
       chart = Charma::BarChart.new(series:[{ y:[-3, -30, -20] }])
       r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
-      range = r.calc_yrange(:y)
-      expect( range.size ).to eq(2)
-      expect( range[0] ).to eq(-30*1.099)
-      expect( range[1] ).to eq(0)
+      yrange, y2range = r.calc_yranges
+      expect( yrange ).to almost_eq_ary([-30*1.099,0], 1e-5)
+      expect( y2range ).to be_nil
+    end
+
+    describe "complex case" do
+      it "creates 1.099*-1 to 1.099*1.6 and 1.099*-12.5 to 1.099*20 ranges" do
+        y = { y:[-1, 0, 1] }
+        y2 = { y2:[-5, 0, 20] }
+        chart = Charma::BarChart.new(series:[y, y2])
+        r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
+        yrange, y2range = r.calc_yranges
+        expect( yrange ).to almost_eq_ary([1.099*-1, 1.099*1.6], 1e-5)
+        expect( y2range ).to almost_eq_ary([1.099*-12.5, 1.099*20], 1e-5)
+      end
+      it "creates 1.099*-2 to 1.099*9 and 1.099*-5 to 1.099*22.5 ranges" do
+        y = { y:[-1, 9] }
+        y2 = { y2:[-5, 20] }
+        chart = Charma::BarChart.new(series:[y, y2])
+        r = Charma::BarChartRenderer.new( chart, nil, Charma::Rect.new( 0, 0, 1, 1) )
+        yrange, y2range = r.calc_yranges
+        expect( yrange ).to almost_eq_ary([1.099*-2, 1.099*9], 1e-5)
+        expect( y2range ).to almost_eq_ary([1.099*-5, 1.099*22.5], 1e-5)
+      end
     end
   end
 
