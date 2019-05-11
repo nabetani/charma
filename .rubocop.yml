@@ -78,3 +78,6 @@ Style/PerlBackrefs:
 
 Style/ParallelAssignment:
   Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
