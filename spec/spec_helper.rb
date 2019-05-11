@@ -23,3 +23,5 @@ def makepath(example, ext )
   body.gsub!( /(^_+)|(_+$)/, "" )
   File.join( SPEC_OUTPUT_DIR, body+ext )
 end
+
+require_relative "rspec_almost_eq_ary"
