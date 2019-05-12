@@ -70,6 +70,7 @@ RSpec.describe :BarChartSamples do
     path = makepath(example, ".pdf" )
     charts = [
       Charma::BarChart.new(
+        title:"simple case",
         series:[
           { name:"y-first", y:[1,2,3,4] },
           { name:"y-second", y:[4,3,2,1] },
@@ -78,6 +79,7 @@ RSpec.describe :BarChartSamples do
         ]
       ),
       Charma::BarChart.new(
+        title:"y:posi and nega, y2:posi and nega",
         series:[
           { name:"y-first", y:[1,2,3,-4] },
           { name:"y-second", y:[4,3,2,1] },
@@ -86,6 +88,7 @@ RSpec.describe :BarChartSamples do
         ]
       ),
       Charma::BarChart.new(
+        title:"y:posi and nega, y2:posi",
         series:[
           { name:"y-first", y:[-1,-2,-3,-4] },
           { name:"y-second", y:[4,3,2,1] },
@@ -94,6 +97,7 @@ RSpec.describe :BarChartSamples do
         ]
       ),
       Charma::BarChart.new(
+        title:"y:nega, y2:posi and nega",
         series:[
           { name:"y-first", y:[-1,-2,-3,-4] },
           { name:"y-second", y:[-4,-3,-2,-1] },
@@ -102,11 +106,48 @@ RSpec.describe :BarChartSamples do
         ]
       ),
       Charma::BarChart.new(
+        title:"y:posi, y2:nega",
         series:[
           { name:"y-first", y:[1,2,3,4] },
           { name:"y-second", y:[4,3,2,1] },
           { name:"y2-first", y2:[-50,-60,-70,-80] },
           { name:"y2-second", y2:[-90,-80,-70,-60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        title:"y:zero, y2:posi",
+        series:[
+          { name:"y-first", y:[0]*4 },
+          { name:"y-second", y:[0]*4 },
+          { name:"y2-first", y2:[50,60,70,80] },
+          { name:"y2-second", y2:[90,80,70,60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        title:"y:zero, y2:posi and nega",
+        series:[
+          { name:"y-first", y:[0]*4 },
+          { name:"y-second", y:[0]*4 },
+          { name:"y2-first", y2:[-50,-60,-70,-80] },
+          { name:"y2-second", y2:[90,80,70,60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        title:"y:zero, y2:nega",
+        series:[
+          { name:"y-first", y:[0]*4 },
+          { name:"y-second", y:[0]*4 },
+          { name:"y2-first", y2:[-50,-60,-70,-80] },
+          { name:"y2-second", y2:[-90,-80,-70,-60] },
+        ]
+      ),
+      Charma::BarChart.new(
+        title:"y:negative and very small postive, y2:posi",
+        series:[
+          { name:"y-first", y:[-0.05, 1, 2, 3] },
+          { name:"y-second", y:[1, 2, 3, 4] },
+          { name:"y2-first", y2:[50,60,70,80] },
+          { name:"y2-second", y2:[90,80,70,60] },
         ]
       )
     ]
