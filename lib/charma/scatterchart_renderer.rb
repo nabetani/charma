@@ -77,5 +77,9 @@ module Charma
         end
       end
     end
+    # チャートを描画する
+    def render_chart
+      yrange, y2range = calc_yranges
+    end
   end
 end
