@@ -23,12 +23,12 @@ module Charma
     }.freeze
 
     # ScatterChart の情報を作る。初期化する
-    # @option opts [String] :title グラフのタイトル。
+    # @option opts [Object] :title グラフのタイトル。
 
     # @option opts [Array] :series 系列。Hash の Array。必須。
-    # @option opts [String] :x_title x軸のタイトル(グラフ下端)。文字列。
-    # @option opts [String] :y_title y軸のタイトル(グラフ左端)。文字列。
-    # @option opts [String] :y2_title 第二y軸のタイトル(グラフ右端)。文字列。
+    # @option opts [Object] :x_title x軸のタイトル(グラフ下端)。文字列。
+    # @option opts [Object] :y_title y軸のタイトル(グラフ左端)。文字列。
+    # @option opts [Object] :y2_title 第二y軸のタイトル(グラフ右端)。文字列。
     # @option opts [Symbol] :legend 凡例の位置。:none と :bottom のいずれか。省略時は :bottom。未対応。
     # @option opts [Symbol] :x_scale x軸のスケール。:linear または :log10
     # @option opts [Symbol] :y_scale x軸のスケール。:linear または :log10
