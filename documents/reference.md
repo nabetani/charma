@@ -105,6 +105,8 @@ end
 
 ## `Charma::BarChart`
 
+縦の棒グラフ
+
 ### `.new(opts)`
 
 `opts` は `Hash`。
@@ -129,7 +131,9 @@ end
 ※ `:y` と `:y2` の両者を持つのはNG。
 ※ `:y` を持つ系列がない(全てが `:y2` を持つ)のはNG。
 
-## `Charma::ScatterPlot`
+## `Charma::ScatterChart`
+
+散布図
 
 ### `.new(opts)`
 
