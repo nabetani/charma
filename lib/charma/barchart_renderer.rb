@@ -28,6 +28,8 @@ module Charma
       }
       # 1.1 にすると、0〜1 のグラフの上端の目盛りが 1.1 になってしまうので、1.099 にする
       expansion = 1.099
+
+      # ゼロ除算対策
       vals[0] = make_simple_range(vals[1]) if vals[0]==[0,0]
       vals[1] = make_simple_range(vals[0]) if vals[1]==[0,0]
       unless vals[1]
