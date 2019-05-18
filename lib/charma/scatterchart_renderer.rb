@@ -48,11 +48,12 @@ module Charma
       }
       # 0.1 にすると、0〜1 のグラフの上端の目盛りが 1.1 になってしまうので、0.099 にする
       expansion = 0.099
-      unless vals[1]
-        diff = vals[0][1]-vals[0][0]
-        return [ expand_range(vals[0], diff*expansion), nil]
+      vals.map do |v|
+        if v
+          diff = v[1]-v[0]
+          expand_range(v, diff*expansion)
+        end # else nil
       end
-      nil
     end
 
   end
