@@ -25,6 +25,14 @@ RSpec.describe Charma::ScatterChartRenderer do
     r
   end
 
+  def series_xrange( vals )
+    mid = vals.sum / vals.size.to_f
+    seq = [ mid, *vals, mid ]
+    seq.map.with_index do |x,ix|
+      { xy:[[x,ix]]*3 }
+    end
+  end
+
   def rect01
     Charma::Rect.new( 0, 0, 1, 1)
   end
@@ -65,6 +73,8 @@ RSpec.describe Charma::ScatterChartRenderer do
           expect( y2range ).to be_nil
         end
       end
+    end
+    describe "without y2, log scale" do
       LOG_EXAMPLES.each do |ex, y|
         real_ex = ex.map{ |e| 10**e }
         real_y = y.map{ |e| 10**e }
@@ -77,8 +87,6 @@ RSpec.describe Charma::ScatterChartRenderer do
         end
       end
     end
-    describe "without y2, log scale" do
-    end
     describe "with y2" do
       EXAMPLES.product(EXAMPLES).each do |(ex_y,y),(ex_y2,y2)|
         it "returns #{[ex_y,ex_y2].inspect} if y-values are in #{[y,y2].inspect}" do
@@ -87,6 +95,46 @@ RSpec.describe Charma::ScatterChartRenderer do
           yrange, y2range = r.calc_yranges
           expect( yrange ).to almost_eq_ary( ex_y, 1e-7 )
           expect( y2range ).to almost_eq_ary( ex_y2, 1e-7 )
+        end
+      end
+    end
+  end
+  describe "#calc_xrange" do
+    EXAMPLES = [
+      [[0,1.099], [0,1]], # 全て0以上なら範囲も0以上になる
+      [[-1.099, 0], [0,-1]], # 全て0以下なら範囲も0以下になる
+      [[-5.99, 5.99], [-5,5]], # 範囲が正負に渡っているなら普通に拡張される
+      [[0,1.0991], [0.0001,1.0001]], # 全て0以上なら範囲も0以上になる
+      [[-1.0991, 0], [-0.0001,-1.0001]], # 全て0以下なら範囲も0以下になる
+      [[100-0.099, 101+0.099], [100, 101]], # 範囲が余裕を持って正なら、普通に拡張される
+      [[-101-0.099, -100+0.099], [-100, -101]], # 範囲が余裕を持って負なら、普通に拡張される
+    ]
+    LOG_EXAMPLES = [
+      [[-0.099,1.099], [0,1]], # 正負に関係なく普通に拡張される
+      [[10-0.099,10+1.099], [10,11]], # 普通に拡張される
+      [[-0.099*10,1.099*10], [0,10]], # 正負に関係なく普通に拡張される
+    ]
+    describe "linear scale" do
+      EXAMPLES.each do |expected, xr|
+        it "returns #{expected.inspect} if x-values are in #{xr.inspect}" do
+          chart = Charma::ScatterChart.new(series:series_xrange(xr))
+          r = Charma::ScatterChartRenderer.new( chart, nil, rect01 )
+          xranges = r.calc_xranges
+          expect( xranges.size ).to eq( 1 )
+          expect( xranges[0] ).to almost_eq_ary( expected, 1e-7 )
+        end
+      end
+    end
+    describe "log10 scale" do
+      LOG_EXAMPLES.each do |ex, x|
+        real_ex = ex.map{ |e| 10**e }
+        real_x = x.map{ |e| 10**e }
+        it "returns #{real_ex.inspect} if x-values are in #{real_x.inspect}" do
+          chart = Charma::ScatterChart.new(x_scale: :log10, series:series_xrange(real_x))
+          r = Charma::ScatterChartRenderer.new( chart, nil, rect01 )
+          xranges = r.calc_xranges
+          expect( xranges.size ).to eq( 1 )
+          expect( xranges[0] ).to almost_eq_ary( real_ex, 1e-7 )
         end
       end
     end

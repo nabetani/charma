@@ -29,12 +29,30 @@ module Charma
       end
     end
 
+    # x の範囲を計算する
+    # 返戻値は 1要素の配列。第一要素が xの範囲。
+    # ※ 対数目盛に対応する
+    def calc_xranges
+      range = @chart[:series].flat_map{ |s|
+        %i( xy xy2 ).flat_map{ |sym|
+          s[sym]&.map{ |xy| scale_value( :x, xy[0] ) }
+        }
+      }.compact.minmax
+      range = expand_range(:x, range, 1) if range[0]==range[1] # ゼロ除算対策
+      # 0.1 にすると、0〜1 のグラフの上端の目盛りが 1.1 になってしまうので、0.099 にする
+      expansion = 0.099
+      diff = range[1]-range[0]
+      axis = :x
+      r = expand_range(axis, range, diff*expansion).map{ |e| unscale_value( axis, e ) }
+      [r]
+    end
+
     # y と y2 の範囲を計算する
     # 返戻値の第一要素が yの範囲。第二要素が y2の範囲。y2 がない場合はnil
     # ※ 対数目盛に対応する
     # ※ y と y2 の y==0 の描画座標が等しくなるようにはしない
     def calc_yranges
-      vals = %i(xy xy2).map{ |sym|
+      ranges = %i(xy xy2).map{ |sym|
         axis = sym==:xy ? :y : :y2
         v = @chart[:series].flat_map{ |s| 
           s[sym]&.map{ |xy| scale_value( axis, xy[1] ) }
@@ -52,13 +70,12 @@ module Charma
       }
       # 0.1 にすると、0〜1 のグラフの上端の目盛りが 1.1 になってしまうので、0.099 にする
       expansion = 0.099
-      vals.zip(%i(y y2)).map do |v, axis|
+      ranges.zip(%i(y y2)).map do |v, axis|
         if v
           diff = v[1]-v[0]
           expand_range(axis, v, diff*expansion).map{ |e| unscale_value( axis, e ) }
         end
       end
     end
-
   end
 end
