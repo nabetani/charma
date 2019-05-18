@@ -14,11 +14,15 @@ RSpec.describe Charma::ScatterChartRenderer do
     end
   end
 
-  def series_yrange( names, minmax )
-    names.map.with_index do |name, ix|
-      mid = minmax.sum / minmax.size.to_f
-      { name=>[ mid, minmax, mid ].flatten.map{ |y| [ix,y] }}
+  def series_yrange( y, y2=nil )
+    seri = lambda do |name,vals|
+      mid = vals.sum / vals.size.to_f
+      { name=>[ mid, vals, mid ].flatten.map.with_index{ |y,ix| [ix,y] }}
     end
+    r=[]
+    r.push seri[:xy, y]
+    r.push seri[:xy2, y2] if y2
+    r
   end
 
   def rect01
@@ -45,7 +49,7 @@ RSpec.describe Charma::ScatterChartRenderer do
       [[-101-0.099, -100+0.099], [-100, -101]], # 範囲が余裕を持って負なら、普通に拡張される
     ].each do |expected, input|
       it "returns #{expected.inspect} if y-values are in #{input.inspect}" do
-        chart = Charma::ScatterChart.new(series:series_yrange(%i(xy), input))
+        chart = Charma::ScatterChart.new(series:series_yrange(input))
         r = Charma::ScatterChartRenderer.new( chart, nil, rect01 )
         yrange, y2range = r.calc_yranges
         expect( yrange ).to almost_eq_ary( expected, 1e-7 )
