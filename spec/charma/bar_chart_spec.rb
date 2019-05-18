@@ -75,6 +75,13 @@ RSpec.describe Charma::BarChart do
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
+    it "will raise if there is unexpected key" do
+      xy = [[1,2],[3,4],[5,6]]
+      expect{
+        Charma::BarChart.new(series:[{y:[1], unexpected:1}], unexpected:"value")
+      }.to raise_error( Charma::Errors::InvalidOption )
+    end
+
     it "will raise if series has unexpected key" do
       expect{
         Charma::BarChart.new({series:[{y:[1], unexpected:1}]})

@@ -36,7 +36,7 @@ module Charma
     # :name :: 系列の名前(凡例に使う)
     def initialize(opts)
       opts.each do |k,v|
-        raise Charma::Error, "#{k.inspect} is not valid key" unless OPTIONS.has_key?(k)
+        raise Errors::InvalidOption, "#{k.inspect} is not valid key" unless OPTIONS.has_key?(k)
         validator = OPTIONS[k]
         validator[k,v] if validator
       end
