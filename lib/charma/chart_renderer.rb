@@ -50,7 +50,6 @@ module Charma
     def scale_value(axis, v)
       case scale_type(axis)
       when :log10
-        p [ axis, v, Math.log10(v) ]
         Math.log10(v)
       when :linear
         v
