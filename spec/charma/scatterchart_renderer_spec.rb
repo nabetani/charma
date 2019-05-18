@@ -49,6 +49,13 @@ RSpec.describe Charma::ScatterChartRenderer do
         [[100-0.099, 101+0.099], [100, 101]], # 範囲が余裕を持って正なら、普通に拡張される
         [[-101-0.099, -100+0.099], [-100, -101]], # 範囲が余裕を持って負なら、普通に拡張される
       ]
+
+      LOG_EXAMPLES = [
+        [[-0.099,1.099], [0,1]], # 正負に関係なく普通に拡張される
+        [[10-0.099,10+1.099], [10,11]], # 普通に拡張される
+        [[-0.099*10,1.099*10], [0,10]], # 正負に関係なく普通に拡張される
+      ]
+
       EXAMPLES.each do |expected, input|
         it "returns #{expected.inspect} if y-values are in #{input.inspect}" do
           chart = Charma::ScatterChart.new(series:series_yrange(input))
@@ -58,6 +65,19 @@ RSpec.describe Charma::ScatterChartRenderer do
           expect( y2range ).to be_nil
         end
       end
+      LOG_EXAMPLES.each do |ex, y|
+        real_ex = ex.map{ |e| 10**e }
+        real_y = y.map{ |e| 10**e }
+        it "returns #{real_ex.inspect} in log10 scale if y-values are in #{real_y.inspect}" do
+          chart = Charma::ScatterChart.new(y_scale: :log10, series:series_yrange(real_y))
+          r = Charma::ScatterChartRenderer.new( chart, nil, rect01 )
+          yrange, y2range = r.calc_yranges
+          expect( yrange ).to almost_eq_ary( real_ex, 1e-7 )
+          expect( y2range ).to be_nil
+        end
+      end
+    end
+    describe "without y2, log scale" do
     end
     describe "with y2" do
       EXAMPLES.product(EXAMPLES).each do |(ex_y,y),(ex_y2,y2)|
