@@ -9,6 +9,7 @@ require_relative "charma/rect"
 require_relative "charma/chart"
 
 require_relative "charma/bar_chart"
+require_relative "charma/scatter_chart"
 
 require_relative "charma/page"
 require_relative "charma/document"
