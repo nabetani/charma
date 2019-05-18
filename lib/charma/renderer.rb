@@ -19,6 +19,8 @@ module Charma
       case ct
       when :bar_chart
         BarChartRenderer
+      when :scatter_chart
+        ScatterChartRenderer
       else
         raise Charma::Error, "unexpected chart type: #{ct}"
       end
