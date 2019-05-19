@@ -80,6 +80,10 @@ module Charma
       !! @chart[:x_ticks]
     end
 
+    def x_marks_area?
+      false
+    end
+
     # チャートを描画する
     def render_chart
       yrange, y2range = calc_yranges

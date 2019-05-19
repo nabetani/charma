@@ -7,6 +7,7 @@ module Charma
     :title,
     :x_title,
     :x_ticks,
+    :x_marks,
     :y_title,
     :y_ticks,
     :y_marks,
@@ -148,15 +149,27 @@ module Charma
       end
     end
 
-    # チャートの左右の縁にある水平線(マーク)を描画する
+    # チャートの左右の縁にある短い水平線(マーク)を描画する
     # area :: マークの領域
     # range :: y の値の範囲
-    # ticks :: 横線を描画する値のリスト
+    # ticks :: マークを描画する値のリスト
     def draw_y_marks(area, range, ticks)
       opts = {style: :solid, color:"000"}
       ticks.each do |v|
         abs_y = abs_y_position( v, area, range )
         @canvas.horizontal_line(area.x, area.right, abs_y, **opts)
+      end
+    end
+
+    # チャートの下の縁にある短い垂直線(マーク)を描画する
+    # area :: マークの領域
+    # range :: x の値の範囲
+    # ticks :: マークを描画する値のリスト
+    def draw_x_marks(area, range, ticks)
+      opts = {style: :solid, color:"000"}
+      ticks.each do |v|
+        abs_x = abs_x_position( v, area, range )
+        @canvas.vertical_line(area.y, area.bottom, abs_x, **opts)
       end
     end
 
@@ -230,12 +243,13 @@ module Charma
         bottom.hsplit( *hsplit_ratio )
       chart_h = 10
       x_tick_h = x_ticks_area? ? 0.7 : 0
+      x_marks_h = x_marks_area? ? 0.15 : 0
       x_title_h = @chart[:x_title] ? 1 : 0
-      vsplit_ratio = [chart_h, x_tick_h, x_title_h]
+      vsplit_ratio = [chart_h, x_marks_h, x_tick_h, x_title_h]
       a.y_title, = left0.vsplit( *vsplit_ratio )
       a.y_ticks, = left1.vsplit( *vsplit_ratio )
       a.y_marks, = left2.vsplit( *vsplit_ratio )
-      a.chart, a.x_ticks, a.x_title = center.vsplit( *vsplit_ratio )
+      a.chart, a.x_marks, a.x_ticks, a.x_title = center.vsplit( *vsplit_ratio )
       a.y2_ticks, = right1.vsplit( *vsplit_ratio )
       a.y2_title, = right0.vsplit( *vsplit_ratio )
       a.y2_marks, = right2.vsplit( *vsplit_ratio )
