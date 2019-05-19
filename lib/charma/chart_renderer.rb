@@ -76,10 +76,10 @@ module Charma
     # グリッドのために適当に切りの良い値を求める
     def tick_unit(v)
       base = (10**Math.log10(v).round).to_f
-      man = v/base
-      return 0.5*base if man<0.6
-      return base if man<1.2
-      base*2
+      [
+        base, base/2, base/2.5, base/5,
+        base/10, base/20, base/25, base/50,
+      ].find{ |u| 5<v/u }
     end
 
     # グリッドに使う値のリストを求める
@@ -87,7 +87,7 @@ module Charma
     # range :: その軸で扱う値の範囲
     def tick_values(axis, range)
       min, max = range.minmax.map{ |e| scale_value( axis, e ) }
-      unit = tick_unit((max - min) * 0.1)
+      unit = tick_unit(max - min)
       i_low = (min / unit).ceil
       i_hi = (max / unit).floor
       (i_low..i_hi).map{ |i| unscale_value( axis, i*unit ) }
