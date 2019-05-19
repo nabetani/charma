@@ -4,6 +4,7 @@ require "prawn"
 require_relative "charma/version"
 require_relative "charma/error"
 
+require_relative "charma/utility"
 require_relative "charma/constants"
 require_relative "charma/rect"
 require_relative "charma/chart"
