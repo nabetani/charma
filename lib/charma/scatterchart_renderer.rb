@@ -86,10 +86,24 @@ module Charma
       true
     end
 
+    def draw_points( area, xrange, y1range, y2range )
+      cols = seq_colors(@chart[:series].size)
+      radius = 10
+      @chart[:series].zip(cols).each do |s,col|
+        positions, yaxis = s[:xy] ? [s[:xy], :y] : [s[:xy2], :y2]
+        yrange = yaxis==:y ? y1range : y2range
+        positions.each do |pos|
+          ax = abs_x_position(pos[0], area, xrange)
+          ay = abs_y_position(pos[1], area, yrange)
+          @canvas.fill_circle( ax, ay, radius, col )
+        end
+      end
+    end
+
     # チャートを描画する
     def render_chart
       yrange, y2range = calc_yranges
-      xrange, =calc_xranges
+      xrange, = calc_xranges
       y_ticks = tick_values(:y, yrange)
       x_ticks = tick_values(:x, xrange)
       draw_y_grid(@areas.chart, yrange, y_ticks)
@@ -99,6 +113,13 @@ module Charma
       draw_x_grid(@areas.chart, xrange, x_ticks)
       draw_x_ticks(@areas.x_ticks, xrange, x_ticks)
       draw_x_marks(@areas.x_marks, xrange, x_ticks)
+      if bottom_legend?
+        scount = @chart[:series].size
+        names = @chart[:series].map{ |e| e[:name] }
+        draw_bottom_regend(@areas.legend, names, seq_colors(scount))
+      end
+      draw_points( @areas.chart, xrange, yrange, y2range )
+      @canvas.stroke_rect(@areas.chart)
     end
   end
 end

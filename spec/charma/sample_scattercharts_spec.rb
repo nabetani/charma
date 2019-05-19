@@ -13,7 +13,13 @@ RSpec.describe :ScatterChartSamples do
   it "simple chart" do |example|
     path = makepath(example, ".pdf" )
     chart = Charma::ScatterChart.new(
-      series: [xy:(-1..4).map{ |e| [e,e] }]
+      title: "foo and bar",
+      x_title: "hoge",
+      y_title: "fuga",
+      series: [
+        {name:"foo", xy:(-1..4).map{ |e| [e,e] }},
+        {name:"bar", xy:(-1..4).map{ |e| [e,4-e] }},
+      ]
     )
     Charma::Document.new do |doc|
       doc.add_page do |page|

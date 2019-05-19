@@ -99,6 +99,16 @@ module Charma
       end
     end
 
+    def fill_circle( cx, cy, r, color )
+      @pdf.save_graphics_state do
+        y = pdf_y(cy)
+        @pdf.fill{
+          @pdf.fill_color( pdf_color(color) )
+          @pdf.circle( [cx,y], r )
+        }
+      end
+    end
+
     # 矩形をフィルする
     # rect :: この矩形をフィルする
     # color :: この色でフィルする
