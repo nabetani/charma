@@ -29,5 +29,30 @@ RSpec.describe Charma::Renderer do
         end
       end
     end
+    it "split a vertical rectangle vertically" do
+      r = Charma::Renderer.new(nil,nil)
+      rect = Charma::Rect.new( 100, 1000, 1, 12 )
+      (2..4).each do |s|
+        split = r.split_page( rect, s )
+        expect( split.size ).to eq(s)
+        s.times do |ix|
+          expect( split[ix] ).to eq(Charma::Rect.new(100, 1000+ix*12/s, 1, 12/s) )
+        end
+      end
+    end
+    it "divides a square into squares" do
+      r = Charma::Renderer.new(nil,nil)
+      rect = Charma::Rect.new( 100, 1000, 60, 60 )
+      (2..5).each do |s|
+        split = r.split_page( rect, s**2 )
+        expect( split.size ).to eq(s**2)
+        s.times do |y|
+          s.times do |x|
+            expected = Charma::Rect.new(100+x*60/s, 1000+y*60/s, 60/s, 60/s)
+            expect( split[y*s+x] ).to eq(expected)
+          end
+        end
+      end
+    end
   end
 end
