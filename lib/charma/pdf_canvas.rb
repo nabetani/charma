@@ -70,6 +70,7 @@ module Charma
       h = @pdf.height_of(t, size:1)
       font_size = opts[:font_size] || [pr.w.to_f/w, pr.h.to_f/h].min * 0.95
 
+      # TODO: remove bounding box
       @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
         @pdf.transparent(1) { @pdf.stroke_bounds }
       end
@@ -106,7 +107,7 @@ module Charma
         pr = pdf_rect(rect)
         @pdf.fill{
           @pdf.fill_color( pdf_color(color) )
-          @pdf.rectangle( [pr.x,  pr.bottom], pr.w, pr.h )
+          @pdf.rectangle( [pr.x, pr.bottom], pr.w, pr.h )
         }
       end
     end
@@ -131,7 +132,7 @@ module Charma
         w = @pdf.width_of(txt, size:1)
         h = @pdf.height_of(txt, size:1)
         [rc.w.to_f/w, rc.h.to_f/h].min
-      }.min
+      }.min*0.95 # "*0.95" しないと次の行を描画しようと上付きになることがある
     end
 
     # 複数の矩形と文字列を指定して、同じ大きさの文字を各矩形に描画する
@@ -143,6 +144,31 @@ module Charma
         size = measure_samesize_texts( rects, texts )
         texts.zip(rects).each do |txt, rc|
           text( txt, rc, font_size:size, align:align )
+        end
+      end
+    end
+
+    def vertical_line( top, bottom, x, style: :solid, color:"000", color2:"fff" )
+      @pdf.save_graphics_state do
+        case style
+        when :solid
+          unless color.nil?
+            @pdf.stroke_color pdf_color(color)
+            @pdf.stroke_vertical_line(pdf_y(top), pdf_y(bottom), at:x)
+          end
+        when :dash
+          unless color.nil?
+            @pdf.dash([2,2])
+            @pdf.stroke_color pdf_color(color)
+            @pdf.stroke_vertical_line(pdf_y(top), pdf_y(bottom), at:x)
+          end
+          unless color2.nil?
+            @pdf.dash([2,2], phase:2)
+            @pdf.stroke_color pdf_color(color2)
+            @pdf.stroke_vertical_line(pdf_y(top), pdf_y(bottom), at:x)
+          end
+        else
+          raise Errors::InternalError, "unexpected line style: #{style.inspect}"
         end
       end
     end

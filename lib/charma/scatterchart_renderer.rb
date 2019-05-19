@@ -77,9 +77,24 @@ module Charma
         end
       end
     end
+
+    def x_ticks_area?
+      true
+    end
+    
     # チャートを描画する
     def render_chart
       yrange, y2range = calc_yranges
+      xrange, =calc_xranges
+      y_ticks = tick_values(:y, yrange)
+      x_ticks = tick_values(:x, xrange)
+      draw_y_grid(@areas.chart, yrange, y_ticks)
+      draw_y_ticks(@areas.y_ticks, yrange, y_ticks)
+      draw_y_marks(@areas.y_marks, yrange, y_ticks)
+
+      draw_x_grid(@areas.chart, xrange, x_ticks)
+      draw_x_ticks(@areas.x_ticks, xrange, x_ticks)
+      # draw_x_marks(@areas.x_marks, xrange, x_ticks)
     end
   end
 end

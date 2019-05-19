@@ -35,7 +35,7 @@ module Charma
       ys = s[:y]
       points = xs.zip(ys).map{ |x,y|
         [
-          abs_x_positoin( x, rect, xrange ),
+          abs_x_position( x, rect, xrange ),
           abs_y_positoin( y, rect, yrange )
         ]
       }
@@ -71,7 +71,7 @@ module Charma
       xtick_texts = @opts[:x_ticks] || xticks.map{ |e| "%g" % e }
       w = area.w*0.7 / xticks.size
       rects = xticks.map{ |rx|
-        ax = abs_x_positoin( rx, area, xrange )
+        ax = abs_x_position( rx, area, xrange )
         Rect.new( ax-w/2, area.y, w, area.h )
       }
       draw_samesize_texts( pdf, rects, xtick_texts, valign: :top )
@@ -88,7 +88,7 @@ module Charma
             pdf.stroke_color "888888"
             pdf.dash([2,2])
           end
-          abs_x = abs_x_positoin( v, area, xrange )
+          abs_x = abs_x_position( v, area, xrange )
           pdf.stroke_vertical_line area.y, area.bottom, at: abs_x
         end
       end

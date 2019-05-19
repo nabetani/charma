@@ -12,7 +12,11 @@ class FakeCanvas
   end
 
   def horizontal_line( left, right, y, style: :solid, color:"000", color2:"fff" )
-    @called << { method: :stroke_horizontal_line, args:[ left, right, y, style, color, color2 ] }
+    @called << { method: :horizontal_line, args:[ left, right, y, style, color, color2 ] }
+  end
+
+  def vertical_line( top, bottom, x, style: :solid, color:"000", color2:"fff" )
+    @called << { method: :vertical_line, args:[ left, right, x, style, color, color2 ] }
   end
 
   def stroke_rect(rect)

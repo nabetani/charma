@@ -76,6 +76,10 @@ module Charma
       end
     end
 
+    def x_ticks_area?
+      !! @chart[:x_ticks]
+    end
+
     # チャートを描画する
     def render_chart
       yrange, y2range = calc_yranges
@@ -93,7 +97,7 @@ module Charma
         draw_y_ticks(@areas.y2_ticks, y2range, y2_ticks)
         draw_y_marks(@areas.y2_marks, y2range, y2_ticks)
       end
-      draw_x_ticks(@areas.x_ticks, @chart[:x_ticks]) if @chart[:x_ticks]
+      draw_x_tick_texts(@areas.x_ticks, @chart[:x_ticks]) if @chart[:x_ticks]
       if bottom_legend?
         scount = @chart[:series].size
         names = @chart[:series].map{ |e| e[:name] }

@@ -104,6 +104,20 @@ module Charma
       @canvas.draw_samesize_texts( rects, texts, align: :right )
     end
 
+    # y軸の値ラベル( x_ticks )を描画する
+    # area :: x_ticks を描画する領域
+    # ticks :: x_ticks に描画する値のリスト
+    def draw_x_ticks(area, range, ticks)
+      w = (area.w / ticks.size) * 0.7
+      rects = ticks.map{ |v|
+        abs_x = abs_x_position( v, area, range )
+        Rect.new( abs_x - w/2, area.y+area.h*0.1, w, area.h*0.8 )
+      }
+      n = (3..20).find{ |w| ticks.map{ |e| "%*g" % [w,e] }.uniq.size == ticks.size }
+      texts = ticks.map{ |v| "%*g " % [ n, v ] }
+      @canvas.draw_samesize_texts( rects, texts, align: :center )
+    end
+
     # チャート内の水平線を描画する
     # area :: チャートの領域
     # range :: y の値の範囲
@@ -116,6 +130,21 @@ module Charma
         s, c = v.zero? ? zero_set : nonzero_set
         abs_y = abs_y_position( v, area, range )
         @canvas.horizontal_line(area.x, area.right, abs_y, style:s, color:c, color2:nil)
+      end
+    end
+
+    # チャート内の垂直線を描画する
+    # area :: チャートの領域
+    # range :: x の値の範囲
+    # ticks :: 横線を描画する値のリスト
+    # x==0 の場合は実線、それ以外は点線を描画する
+    def draw_x_grid(area, range, ticks)
+      zero_set = [ :solid, "000" ]
+      nonzero_set = [ :dash, "888" ]
+      ticks.each do |v|
+        s, c = v.zero? ? zero_set : nonzero_set
+        abs_x = abs_x_position( v, area, range )
+        @canvas.vertical_line(area.y, area.bottom, abs_x, style:s, color:c, color2:nil)
       end
     end
 
@@ -161,7 +190,7 @@ module Charma
     # v :: 変換される相対位置
     # rc :: 領域。左端が xrange[0] ,右端が xrange[1] に対応する。
     # xrange :: 値の範囲
-    def abs_x_positoin(v, rc, xrange)
+    def abs_x_position(v, rc, xrange)
       rx, min, max = [ v, *xrange ].map{ |e| scale_value(:x, e) }
       (rx-min) * rc.w / (max-min) + rc.x
     end
@@ -200,7 +229,7 @@ module Charma
       _, _, _, a.legend, =
         bottom.hsplit( *hsplit_ratio )
       chart_h = 10
-      x_tick_h = @chart[:x_ticks] ? 0.7 : 0
+      x_tick_h = x_ticks_area? ? 0.7 : 0
       x_title_h = @chart[:x_title] ? 1 : 0
       vsplit_ratio = [chart_h, x_tick_h, x_title_h]
       a.y_title, = left0.vsplit( *vsplit_ratio )
@@ -215,7 +244,7 @@ module Charma
     # x_ticks を描画する
     # area :: x_ticks に使える領域
     # texts :: x_ticks に描画する文字列のリスト
-    def draw_x_ticks( area, texts )
+    def draw_x_tick_texts( area, texts )
       rects = area.hsplit( *([1]*texts.size) ).map{ |rc|
         rc.hsplit(1,10,1)[1]
       }
