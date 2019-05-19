@@ -66,8 +66,10 @@ module Charma
       case scale_type(axis)
       when :log10
         10**v
-      else
+      when :linear
         v
+      else
+        raise Errors::LogicError, "unexpected scale type: #{scale_type(axis).inspect}"
       end
     end
 
@@ -94,10 +96,10 @@ module Charma
     # y軸の値ラベル( y_ticks )を描画する
     # area :: y_ticks を描画する領域
     # ticks :: y_ticks に描画する値のリスト
-    def draw_y_ticks(area, range, ticks)
+    def draw_y_ticks(axis, area, range, ticks)
       h = (area.h / ticks.size) * 0.7
       rects = ticks.map{ |v|
-        abs_y = abs_y_position( v, area, range )
+        abs_y = abs_y_position(axis, v, area, range )
         Rect.new( area.x+area.w*0.1, abs_y - h/2, area.w*0.8, h )
       }
       n = (3..20).find{ |w| ticks.map{ |e| "%*g" % [w,e] }.uniq.size == ticks.size }
@@ -124,12 +126,12 @@ module Charma
     # range :: y の値の範囲
     # ticks :: 横線を描画する値のリスト
     # y==0 の場合は実線、それ以外は点線を描画する
-    def draw_y_grid(area, range, ticks)
+    def draw_y_grid(axis, area, range, ticks)
       zero_set = [ :solid, "000" ]
       nonzero_set = [ :dash, "888" ]
       ticks.each do |v|
         s, c = v.zero? ? zero_set : nonzero_set
-        abs_y = abs_y_position( v, area, range )
+        abs_y = abs_y_position(axis, v, area, range )
         @canvas.horizontal_line(area.x, area.right, abs_y, style:s, color:c, color2:nil)
       end
     end
@@ -153,10 +155,10 @@ module Charma
     # area :: マークの領域
     # range :: y の値の範囲
     # ticks :: マークを描画する値のリスト
-    def draw_y_marks(area, range, ticks)
+    def draw_y_marks(axis, area, range, ticks)
       opts = {style: :solid, color:"000"}
       ticks.each do |v|
-        abs_y = abs_y_position( v, area, range )
+        abs_y = abs_y_position(axis, v, area, range )
         @canvas.horizontal_line(area.x, area.right, abs_y, **opts)
       end
     end
@@ -212,8 +214,8 @@ module Charma
     # v :: 変換される相対位置
     # rc :: 領域。上端が yrange[0] ,下端が yrange[1] に対応する。
     # yrange :: 値の範囲
-    def abs_y_position(v, rc, yrange)
-      ry, min, max = [ v, *yrange ].map{ |e| scale_value(:y, e) }
+    def abs_y_position(axis, v, rc, yrange)
+      ry, min, max = [ v, *yrange ].map{ |e| scale_value(axis, e) }
       (max-ry) * rc.h / (max-min) + rc.y
     end
 

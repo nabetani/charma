@@ -64,6 +64,11 @@ module Charma
       raise Errors::InvalidOption, "At least one series has y" if no_y
     end
 
+    # 第二y軸があるかどうか。ある場合は true。
+    def y2?
+      !! @opts[:series].any?{ |e| e[:y2] }
+    end
+
     # チャートの種別を返す
     def chart_type
       :bar_chart

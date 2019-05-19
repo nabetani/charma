@@ -49,11 +49,6 @@ module Charma
       @opts = opts
     end
 
-    # 第二y軸があるかどうか。ある場合は true。
-    def y2?
-      !! @opts[:series].any?{ |e| e[:y2] }
-    end
-
     # オプションへのアクセサ
     def [](key)
       @opts[key]

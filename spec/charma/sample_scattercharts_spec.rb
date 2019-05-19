@@ -84,4 +84,35 @@ RSpec.describe :ScatterChartSamples do
     end
     expect( File.exist?( path ) ).to be true
   end
+
+  it "log10 scale with y2" do |example|
+    path = makepath(example, ".pdf" )
+    charts = Array.new(8) do |ix|
+      x = ix[0]==0 ? :linear : :log10
+      xf = ix[0]==0 ? ->(v){ v } : ->(v){ 10**v }
+      y = ix[1]==0 ? :linear : :log10
+      yf = ix[1]==0 ? ->(v){ v } : ->(v){ 10**v }
+      y2 = ix[2]==0 ? :linear : :log10
+      y2f = ix[2]==0 ? ->(v){ v } : ->(v){ 10**v }
+      Charma::ScatterChart.new(
+        x_scale: x,
+        y_scale: y,
+        y2_scale: y2,
+        title: "x:#{x}, y:#{y}, y2:#{y2}",
+        series: [
+          {xy:(-1..4).map{ |e| [xf[e], yf[e]] }},
+          {xy2:(-1..4).map{ |e| [xf[e+0.5], 1000*y2f[e]] }}
+        ]
+      )
+    end
+    Charma::Document.new do |doc|
+      doc.add_page do |page|
+        charts.each do |chart|
+          page.add_chart( chart )
+        end
+      end
+      doc.render( path )
+    end
+    expect( File.exist?( path ) ).to be true
+  end
 end

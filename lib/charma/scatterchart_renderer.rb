@@ -91,7 +91,7 @@ module Charma
       areasize = area.w * area.h
       radius0 = ( areasize.to_f / point_count )**0.5 * 0.1
       wh = [area.w, area.h].min
-      Charma.value_within_range( wh*0.003, wh*0.05, radius0 )
+      radius0.clamp( wh*0.003, wh*0.05 )
     end
 
     def draw_points( area, xrange, y1range, y2range )
@@ -102,10 +102,14 @@ module Charma
         yrange = yaxis==:y ? y1range : y2range
         positions.each do |pos|
           ax = abs_x_position(pos[0], area, xrange)
-          ay = abs_y_position(pos[1], area, yrange)
+          ay = abs_y_position(yaxis, pos[1], area, yrange)
           @canvas.fill_circle( ax, ay, radius, col )
         end
       end
+    end
+
+    def y2?
+      !! @chart[:series].any?{ |s| s[:xy2] }
     end
 
     # チャートを描画する
@@ -114,9 +118,15 @@ module Charma
       xrange, = calc_xranges
       y_ticks = tick_values(:y, yrange)
       x_ticks = tick_values(:x, xrange)
-      draw_y_grid(@areas.chart, yrange, y_ticks)
-      draw_y_ticks(@areas.y_ticks, yrange, y_ticks)
-      draw_y_marks(@areas.y_marks, yrange, y_ticks)
+      draw_y_grid(:y, @areas.chart, yrange, y_ticks)
+      draw_y_ticks(:y, @areas.y_ticks, yrange, y_ticks)
+      draw_y_marks(:y, @areas.y_marks, yrange, y_ticks)
+
+      if @chart.y2?
+        y2_ticks = tick_values(:y2, y2range)
+        draw_y_ticks(:y2, @areas.y2_ticks, y2range, y2_ticks)
+        draw_y_marks(:y2, @areas.y2_marks, y2range, y2_ticks)
+      end
 
       draw_x_grid(@areas.chart, xrange, x_ticks)
       draw_x_ticks(@areas.x_ticks, xrange, x_ticks)

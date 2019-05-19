@@ -55,8 +55,8 @@ module Charma
       bar_rects.zip(ys, cols).each.with_index do |(bar, y, col),ix|
         axis = @chart[:series][ix][:y] ? :y : :y2
         range = axis==:y ? yrange : y2range
-        ay = abs_y_position(y, bar, range)
-        zero = abs_y_position(0, bar, range)
+        ay = abs_y_position(axis, y, bar, range)
+        zero = abs_y_position(axis, 0, bar, range)
         t, b = [ ay, zero ].minmax
         rc = Rect.new( bar.x, t, bar.w, b-t )
         @canvas.fill_rect( rc, col )
@@ -93,13 +93,13 @@ module Charma
         draw_bars(ys, rc, cols, yrange, y2range)
       end
       y_ticks = tick_values(:y, yrange)
-      draw_y_grid(@areas.chart, yrange, y_ticks)
-      draw_y_ticks(@areas.y_ticks, yrange, y_ticks)
-      draw_y_marks(@areas.y_marks, yrange, y_ticks)
+      draw_y_grid(:y, @areas.chart, yrange, y_ticks)
+      draw_y_ticks(:y, @areas.y_ticks, yrange, y_ticks)
+      draw_y_marks(:y, @areas.y_marks, yrange, y_ticks)
       if @chart.y2?
         y2_ticks = tick_values(:y2, y2range)
-        draw_y_ticks(@areas.y2_ticks, y2range, y2_ticks)
-        draw_y_marks(@areas.y2_marks, y2range, y2_ticks)
+        draw_y_ticks(:y2, @areas.y2_ticks, y2range, y2_ticks)
+        draw_y_marks(:y2, @areas.y2_marks, y2range, y2_ticks)
       end
       draw_x_tick_texts(@areas.x_ticks, @chart[:x_ticks]) if @chart[:x_ticks]
       if bottom_legend?
