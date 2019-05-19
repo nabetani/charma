@@ -86,13 +86,17 @@ module Charma
       true
     end
 
-    def draw_points( area, xrange, y1range, y2range )
-      cols = seq_colors(@chart[:series].size)
+    def point_radius(area)
       point_count = @chart[:series].sum{ |s| (s[:xy]||s[:xy2]).size }
       areasize = area.w * area.h
       radius0 = ( areasize.to_f / point_count )**0.5 * 0.1
       wh = [area.w, area.h].min
-      radius = Charma.value_within_range( wh*0.003, wh*0.05, radius0 )
+      Charma.value_within_range( wh*0.003, wh*0.05, radius0 )
+    end
+
+    def draw_points( area, xrange, y1range, y2range )
+      cols = seq_colors(@chart[:series].size)
+      radius = point_radius(area)
       @chart[:series].zip(cols).each do |s,col|
         positions, yaxis = s[:xy] ? [s[:xy], :y] : [s[:xy2], :y2]
         yrange = yaxis==:y ? y1range : y2range
