@@ -82,7 +82,7 @@ RSpec.describe Charma::ViolinChart do
         Charma::ViolinChart.new({series:[{y:[[[1]]]}]})
       }.to raise_error( Charma::Errors::InvalidOption, pat )
     end
-    it "will raise if series.y2 is NOT Array of Numeric" do
+    it "raises if series.y2 is NOT Array of Numeric" do
       expect{
         Charma::ViolinChart.new({series:[{y:[[1]]}, {y2:[[1]]}]})
       }.not_to raise_error
@@ -106,6 +106,29 @@ RSpec.describe Charma::ViolinChart do
       expect{
         Charma::ViolinChart.new({series:[{y:[[1]]}, {y2:[[[1]]]}]})
       }.to raise_error( Charma::Errors::InvalidOption, pat )
+    end
+    it "raises if a series has both y and y2" do
+      expect{
+        Charma::ViolinChart.new({series:[{y:[[2]], y2:[[1]]}]})
+      }.to raise_error( Charma::Errors::InvalidOption, /both y and y2/ )
+    end
+
+    it "raises if no series has y" do
+      expect{
+        Charma::ViolinChart.new({series:[{y2:[[1]]}, {y2:[[1]]}]})
+      }.to raise_error( Charma::Errors::InvalidOption, /At least one series has y/ )
+    end
+
+    it "raises if there is unexpected key" do
+      expect{
+        Charma::ViolinChart.new(series:[{y:[[1]], unexpected:1}], unexpected:"value")
+      }.to raise_error( Charma::Errors::InvalidOption, /is not valid key/ )
+    end
+
+    it "raises if series has unexpected key" do
+      expect{
+        Charma::ViolinChart.new({series:[{y:[[1]], unexpected:1}]})
+      }.to raise_error( Charma::Errors::InvalidOption, /is not valid key/ )
     end
   end
 end
