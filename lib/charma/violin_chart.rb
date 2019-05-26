@@ -68,5 +68,15 @@ module Charma
         end
       end
     end
+
+    # 第二y軸があるかどうか。ある場合は true。
+    def y2?
+      !! @opts[:series].any?{ |e| e[:y2] }
+    end
+
+    # チャートの種別を返す
+    def chart_type
+      :violin_chart
+    end
   end
 end

@@ -127,8 +127,45 @@ RSpec.describe Charma::ViolinChart do
 
     it "raises if series has unexpected key" do
       expect{
-        Charma::ViolinChart.new({series:[{y:[[1]], unexpected:1}]})
+        Charma::ViolinChart.new(series:[{y:[[1]], unexpected:1}])
       }.to raise_error( Charma::Errors::InvalidOption, /is not valid key/ )
+    end
+
+    it "will raise unless x_ticks are Array or nil" do
+      expect{
+        Charma::ViolinChart.new(x_ticks:["a"], series:[{y:[[1]]}])
+      }.not_to raise_error
+
+      expect{
+        Charma::ViolinChart.new(x_ticks:"a", series:[{y:[[1]]}])
+      }.to raise_error( Charma::Errors::InvalidOption, /x_ticks/ )
+
+      expect{
+        Charma::ViolinChart.new(x_ticks:[1], series:[{y:[[1]]}])
+      }.not_to raise_error
+    end
+  end
+  describe "#chart_type" do
+    it "returns :violin_chart" do
+      c = Charma::ViolinChart.new(series:[{y:[[1]]}])
+      expect(c.chart_type).to eq(:violin_chart)
+    end
+  end
+  describe "#y2?" do
+    it "returns false if no series has y2" do
+      c = Charma::ViolinChart.new(series:[{y:[[1]]}])
+      expect(c.y2?).to be false
+    end
+    it "returns true if some series has y2" do
+      (1..10).each do |pattern|
+        pat = pattern.to_s(2).chars
+        next if pat.uniq.size==1
+        s = pat.map{ |c|
+          { ( c=="0" ? :y : :y2 )=>[[1]] }
+        }
+        c = Charma::ViolinChart.new(series:s)
+        expect(c.y2?).to be true
+      end
     end
   end
 end
