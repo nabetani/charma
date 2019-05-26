@@ -1,122 +1,72 @@
 # frozen_string_literal: true
 
 module Charma
+  # バイオリンチャートの情報
   class ViolinChart < Chart
+    # オプション
+    OPTIONS = {
+      title:nil,
+      series:required(Array, Hash),
+      x_ticks:nil_or(Array),
+      x_title:nil,
+      y_title:nil,
+      y2_title:nil
+      # y_scale:one_of( nil, :linear, :log10 ) 棒グラフに対数目盛は不適切なので対応しない
+      # y2_scale:one_of( nil, :linear, :log10 ) 棒グラフに対数目盛は不適切なので対応しない
+    }.freeze
+
+    # 系列につけられるオプション
+    SERIES_OPTIONS = {
+      y:nil_or(Array, Array),
+      y2:nil_or(Array, Array),
+      name:nil
+    }.freeze
+    
     def initialize(opts)
+      opts.each do |k,v|
+        raise Errors::InvalidOption, "#{k.inspect} is not valid key" unless OPTIONS.has_key?(k)
+        validator = OPTIONS[k]
+        validator[k,v] if validator
+      end
+      OPTIONS.each do |k,v|
+        next unless v
+        v[k, opts[k]]
+      end
+      validate_series(opts[:series])
       super(opts)
     end
 
-    # TODO: LineChart に同じようなメソッドがあるのでなんとかする
-    def calc_range(sym)
-      r0 = @opts[:series].map{ |e| e[sym] }.flatten.minmax
-      dist = r0[1] - r0[0]
-      delta = dist==0 ? 1 : dist*0.1
-      raw_range =
-        if 0<=r0[0]
-          [[r0[0]-delta, 0].max, r0[1]+delta]
-        else
-          [r0[0]-delta, r0[1]+delta]
-        end
-      raw_range.map{ |e| unscale_value( sym, e ) }
-    end
-
-    # TODO: BarChart に同じメソッドがあるのでなんとかする
-    def render_xticks(pdf, area)
-      rects = area.hsplit(*Array.new(@opts[:x_ticks].size){ 1 }).map{ |rc0|
-        rc0.hsplit(1,8,1)[1]
-      }
-      draw_samesize_texts( pdf, rects, @opts[:x_ticks], valign: :top )
-    end
-
-    def draw_violin(pdf, rect, yrange, hists, cols)
-      ratio = 0.75
-      _, violins, = rect.hsplit( (1-ratio)/2, ratio, (1-ratio)/2 )
-      v_rects = violins.hsplit(*Array.new(hists.size,1))
-      v_rects.zip(hists, cols) do |rc, hist, col|
-        cx = rc.x + rc.w/2
-        h = rc.h / hist.size.to_f
-        hist.each.with_index do |f, ix|
-          next if f==0
-          w = rc.w * f
-          top = rc.bottom + h*(ix+1)
-          edge = 1e-1 # バーの隙間を埋める
-          fill_rect( pdf, Rect.new( cx-w/2, top + edge, w, h + edge*2 ), col )
+    def validate_series_y(sym, y)
+      return if y.nil?
+      msg = "Series.#{sym} should be Array of Array of Numeric"
+      raise Errors::InvalidOption, msg unless y.is_a?( Array )
+      okay = y.all? do |vals|
+        vals.is_a?( Array ) && vals.all? do |val|
+          val.is_a?( Numeric )
         end
       end
+      raise Errors::InvalidOption, msg unless okay
     end
 
-    def meansize( vals )
-      sum=0.0
-      count=0
-      vals.each do |vvv|
-        vvv.each do |vv|
-          sum += vv.size
-          count+=1
+    # 系列の値を確認する。受け入れられない場合は例外。
+    def validate_series(ss)
+      raise Errors::InvalidOption, "Series should not be empty" if ss.empty?
+      ss.each do |s|
+        s.each do |k,v|
+          raise Errors::InvalidOption, "#{k.inspect} in series is not valid key" unless SERIES_OPTIONS.has_key?(k)
+          validator = SERIES_OPTIONS[k]
+          validator[k,v] if validator
+        end
+        raise Errors::InvalidOption, "Either y or y2 is required" unless s[:y] || s[:y2]
+        raise Errors::InvalidOption, "You can not specify both y and y2" if s[:y] && s[:y2]
+      end
+      no_y = ss.none?{ |s| !!s[:y] }
+      raise Errors::InvalidOption, "At least one series has y" if no_y
+      %i(y y2).each do |sym|
+        ss.each do |s|
+          validate_series_y(sym, s[sym])
         end
       end
-      sum / count
-    end
-
-    def make_histograms( vals, range )
-      hist_size = @opts[:bins] || [10,Math.sqrt( meansize(vals) ).round].max
-      min = range.min
-      step = (range.max - min).to_f / hist_size
-      bottoms = Array.new(hist_size){ |ix| min + (ix+1)*step }
-      raw_h = vals.map{ |vvv|
-        vvv.map{ |vv|
-          vv.each.with_object([0]*hist_size){ |v,o|
-            ix = bottoms.index{ |b| v<b }
-            o[ix]+=1
-          }
-        }
-      }
-      ratio = 1.0 / raw_h.flatten.max
-      raw_h.map{ |vvv|
-        vvv.map{ |vv|
-          vv.map{ |e| e*ratio }
-        }
-      }
-    end
-
-    def render_chart(pdf, rect, yrange)
-      stroke_rect(pdf, rect)
-      y_values = @opts[:series].map{ |s| s[:y] }.transpose
-      bar_areas = rect.hsplit(*Array.new(y_values.size,1))
-      cols = if y_values.first.size==1
-        colors(y_values.size).map{ |e| [e] }
-      else
-        [colors(y_values.first.size)] * y_values.size
-      end
-      hists = make_histograms(y_values, yrange)
-      hists.zip(bar_areas, cols).each do |h, rc, c|
-        draw_violin(pdf, rc, yrange, h, c)
-      end
-    end
-
-    # BarChart の render とほぼ同じなのでなんとかする
-    def render( pdf, rect )
-      title_text = @opts[:title]
-      title, main, ticks, bottom = rect.vsplit(
-        (title_text ? 1 : 0),
-        7,
-        (@opts[:x_ticks] ? 0.5 : 0),
-        (bottom_legend? ? 0.5 : 0))
-      draw_text( pdf, title, title_text ) if title_text
-      hratio = [(@opts[:y_label] ? 1 : 0), 1, 10]
-      ylabel, yticks, chart = main.hsplit(*hratio)
-      yrange = @opts[:y_range] || calc_range(:y)
-      render_chart(pdf, chart, yrange)
-      if @opts[:y_label]
-        render_rottext(pdf, ylabel, @opts[:y_label] )
-      end
-      if @opts[:x_ticks]
-        _, _, xticks = ticks.hsplit(*hratio)
-        render_xticks(pdf, xticks)
-      end
-      yvalues = tick_values(:y, yrange)
-      render_yticks(pdf, yticks, yrange, yvalues)
-      render_y_grid(pdf, chart, yrange, yvalues)
-      render_legend(pdf, bottom) if bottom_legend?
     end
   end
 end

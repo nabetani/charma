@@ -22,13 +22,19 @@ module Charma
     # なくてもいいオプションであることを示すマーカー
     # type :: 値の型
     # inner_type :: 値の要素型。値が Array の場合などに使う。
-    def self.nil_or(type, inner_type = nil)
+    def self.nil_or(type, inner_type = nil, inner_inner_type = nil)
       lambda do |k, v|
         return if v.nil?
         raise Errors::InvalidOption, "#{k} should be #{type}" unless v.is_a?(type)
         if inner_type
-          unless v.all?{ |e| e.is_a?(inner_type) }
-            raise Errors::InvalidOption, "item in #{k} should be #{inner_type}"
+          if inner_inner_type
+            unless v.all?{ |e| e.is_a?(inner_type) }
+              raise Errors::InvalidOption, "item in #{k} should be #{inner_type}"
+            end
+          else
+            unless v.all?{ |e| e.is_a?(inner_type) }
+              raise Errors::InvalidOption, "item in #{k} should be #{inner_type}"
+            end
           end
         end
       end
