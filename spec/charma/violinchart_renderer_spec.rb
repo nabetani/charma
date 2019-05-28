@@ -81,6 +81,19 @@ RSpec.describe Charma::ViolinChartRenderer do
           end
         end
       end
+      describe "linear/log scale" do
+        EXAMPLES.product(LOG_EXAMPLES).each do |(ex_y,y),(ex_y2,y2)|
+          real_ex2 = ex_y2.map{ |e| 10**e }
+          real_y2 = y2.map{ |e| 10**e }
+          it "returns #{[ex_y,real_ex2].inspect} if y-values are in #{[y,real_y2].inspect}" do
+            chart = Charma::ViolinChart.new(y2_scale: :log10, series:series_yrange(y, real_y2))
+            r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
+            yrange, y2range = r.calc_yranges
+            expect( yrange ).to almost_eq_ary( ex_y, 1e-7 )
+            expect( y2range ).to almost_eq_ary( real_ex2, 1e-7 )
+          end
+        end
+      end
     end
   end
 end
