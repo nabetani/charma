@@ -19,6 +19,7 @@ module Charma
       false
     end
 
+    # TODO: 同じメソッドが scatterchart_renderer にある
     def expand_range( axis, range, width )
       min, max = range.minmax
       xmin = min-width
