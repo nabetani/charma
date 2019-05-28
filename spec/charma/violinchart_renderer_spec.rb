@@ -56,6 +56,4 @@ RSpec.describe Charma::ViolinChartRenderer do
       end
     end
   end
-
 end
-
