@@ -69,5 +69,18 @@ RSpec.describe Charma::ViolinChartRenderer do
         end
       end
     end
+    describe "with y2" do
+      describe "linear scale" do
+        EXAMPLES.product(EXAMPLES).each do |(ex_y,y),(ex_y2,y2)|
+          it "returns #{[ex_y,ex_y2].inspect} if y-values are in #{[y,y2].inspect}" do
+            chart = Charma::ViolinChart.new(series:series_yrange(y, y2))
+            r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
+            yrange, y2range = r.calc_yranges
+            expect( yrange ).to almost_eq_ary( ex_y, 1e-7 )
+            expect( y2range ).to almost_eq_ary( ex_y2, 1e-7 )
+          end
+        end
+      end
+    end
   end
 end
