@@ -54,6 +54,19 @@ RSpec.describe Charma::ViolinChartRenderer do
           expect( y2range ).to be_nil
         end
       end
+      describe "without y2, log scale" do
+        LOG_EXAMPLES.each do |ex, y|
+          real_ex = ex.map{ |e| 10**e }
+          real_y = y.map{ |e| 10**e }
+          it "returns #{real_ex.inspect} in log10 scale if y-values are in #{real_y.inspect}" do
+            chart = Charma::ViolinChart.new(y_scale: :log10, series:series_yrange(real_y))
+            r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
+            yrange, y2range = r.calc_yranges
+            expect( yrange ).to almost_eq_ary( real_ex, 1e-7 )
+            expect( y2range ).to be_nil
+          end
+        end
+      end
     end
   end
 end

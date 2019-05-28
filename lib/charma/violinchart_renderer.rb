@@ -57,12 +57,13 @@ module Charma
           nil
         else
           candidate = v.minmax
-          if candidate[0]==candidate[1]
+          mm = if candidate[0]==candidate[1]
             expand_range( sym, candidate, 1 ) # ゼロ除算対策
           else
             diff = candidate[1]-candidate[0]
             expand_range( sym, candidate, diff*0.099 )
           end
+          mm.map{ |e| unscale_value(sym, e) }
         end
       }
     end

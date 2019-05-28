@@ -10,9 +10,9 @@ module Charma
       x_ticks:nil_or(Array),
       x_title:nil,
       y_title:nil,
-      y2_title:nil
-      # y_scale:one_of( nil, :linear, :log10 ) 棒グラフに対数目盛は不適切なので対応しない
-      # y2_scale:one_of( nil, :linear, :log10 ) 棒グラフに対数目盛は不適切なので対応しない
+      y2_title:nil,
+      y_scale:one_of( nil, :linear, :log10 ),
+      y2_scale:one_of( nil, :linear, :log10 ),
     }.freeze
 
     # 系列につけられるオプション
