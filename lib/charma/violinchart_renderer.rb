@@ -67,5 +67,74 @@ module Charma
         end
       }
     end
+
+    # 色を生成する。
+    # 系列が複数の場合は系列ごとに同じ色。
+    # 系列が一つの場合はすべて別の色
+    # TODO: barchart_renderer に同じメソッドがある
+    def create_colors
+      scount = @chart[:series].size
+      ssize = @chart[:series].map{ |s| (s[:y]||s[:y2]).size }.max
+      if scount==1
+        seq_colors(ssize).map{ |e| [e] }
+      else
+        [seq_colors(scount)] * ssize
+      end
+    end
+
+    # y の値のリストのリストから、ヒストグラムを作る
+    def ratios_from_values( yv, bins, yrange, y2range )
+      y_ranges = Array.new(bins){ |ix|
+        lo = yrange[0] + ( yrange[1]-yrange[0] ) * ix.to_f / bins
+        hi = yrange[0] + ( yrange[1]-yrange[0] ) * (ix+1).to_f / bins
+        (lo...hi)
+      }
+      pp yv
+      pp y_ranges
+      counts = yv.map{ |yyy|
+        yyy.map{ |yy|
+          y_ranges.map{ |r| yy.count{ |y| r.include?(y) } }
+        }
+      }
+      pp counts
+      max = counts.flatten.max
+      p "max=#{max}"
+      counts.map{ |ccc|
+        ccc.map{ |cc|
+          cc.map{ |c| c.to_f/max }
+        }
+      }
+    end
+
+    # チャートを描画する
+    def render_chart
+      yrange, y2range = calc_yranges
+      y_values = @chart[:series].map{ |s| s[:y]||s[:y2] }.compact.transpose
+      violin_areas = @areas.chart.hsplit(*([1]*y_values.size))
+      bins = 10 # TODO: チャートから取ってくる
+      y_ratios = ratios_from_values( y_values, bins, yrange, y2range )
+      pp violin_areas
+      y_ratios.zip(violin_areas, create_colors).each do |ys, rc, cols|
+        p [ys, rc, cols, yrange, y2range]
+        @canvas.stroke_rect(rc)
+        # draw_violins(ys, rc, cols, yrange, y2range)
+      end
+      y_ticks = tick_values(:y, yrange)
+      draw_y_grid(:y, @areas.chart, yrange, y_ticks)
+      draw_y_ticks(:y, @areas.y_ticks, yrange, y_ticks)
+      draw_y_marks(:y, @areas.y_marks, yrange, y_ticks)
+      if @chart.y2?
+        y2_ticks = tick_values(:y2, y2range)
+        draw_y_ticks(:y2, @areas.y2_ticks, y2range, y2_ticks)
+        draw_y_marks(:y2, @areas.y2_marks, y2range, y2_ticks)
+      end
+      draw_x_tick_texts(@areas.x_ticks, @chart[:x_ticks]) if @chart[:x_ticks]
+      if bottom_legend?
+        scount = @chart[:series].size
+        names = @chart[:series].map{ |e| e[:name] }
+        draw_bottom_regend(@areas.legend, names, seq_colors(scount))
+      end
+      @canvas.stroke_rect(@areas.chart)
+    end
   end
 end

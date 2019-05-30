@@ -8,6 +8,7 @@ RSpec.describe Charma::Renderer do
       r = Charma::Renderer.new(nil,nil)
       expect( r.chart_renderer( :bar_chart ) ).to eq( Charma::BarChartRenderer )
       expect( r.chart_renderer( :scatter_chart ) ).to eq( Charma::ScatterChartRenderer )
+      expect( r.chart_renderer( :violin_chart ) ).to eq( Charma::ViolinChartRenderer )
     end
   end
   describe "#split_page" do

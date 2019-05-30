@@ -21,6 +21,8 @@ module Charma
         BarChartRenderer
       when :scatter_chart
         ScatterChartRenderer
+      when :violin_chart
+        ViolinChartRenderer
       else
         raise Charma::Error, "unexpected chart type: #{ct}"
       end
