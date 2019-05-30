@@ -89,21 +89,30 @@ module Charma
         hi = yrange[0] + ( yrange[1]-yrange[0] ) * (ix+1).to_f / bins
         (lo...hi)
       }
-      pp yv
-      pp y_ranges
       counts = yv.map{ |yyy|
         yyy.map{ |yy|
           y_ranges.map{ |r| yy.count{ |y| r.include?(y) } }
         }
       }
-      pp counts
       max = counts.flatten.max
-      p "max=#{max}"
       counts.map{ |ccc|
         ccc.map{ |cc|
           cc.map{ |c| c.to_f/max }
         }
       }
+    end
+
+    def draw_violins(rs, rc0, cols, yrange, y2range)
+      rcs = rc0.hsplit(*([1]*rs.size))
+      rcs.zip(rs).each do |rc, rr|
+        boards = rc.vsplit(*([1]*rr.size)).reverse
+        boards.zip(rr).each do |board, r|
+          next if r.zero?
+          w = board.w * r
+          cell = Rect.new( board.cx - w/2, board.y, w, board.h )
+          @canvas.fill_rect( cell, "f00" )
+        end
+      end
     end
 
     # チャートを描画する
@@ -113,11 +122,9 @@ module Charma
       violin_areas = @areas.chart.hsplit(*([1]*y_values.size))
       bins = 10 # TODO: チャートから取ってくる
       y_ratios = ratios_from_values( y_values, bins, yrange, y2range )
-      pp violin_areas
-      y_ratios.zip(violin_areas, create_colors).each do |ys, rc, cols|
-        p [ys, rc, cols, yrange, y2range]
+      y_ratios.zip(violin_areas, create_colors).each do |rs, rc, cols|
         @canvas.stroke_rect(rc)
-        # draw_violins(ys, rc, cols, yrange, y2range)
+        draw_violins(rs, rc, cols, yrange, y2range)
       end
       y_ticks = tick_values(:y, yrange)
       draw_y_grid(:y, @areas.chart, yrange, y_ticks)
