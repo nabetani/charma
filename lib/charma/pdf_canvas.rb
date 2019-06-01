@@ -22,6 +22,13 @@ module Charma
       mb.top - y
     end
 
+    def pdf_points(points)
+      top = @pdf.margin_box.top
+      points.map{ |x,y|
+        [x, top-y]
+      }
+    end
+
     # 矩形を普通の座標系から PDF座標系に変換する
     def pdf_rect( rc )
       mb = @pdf.margin_box
@@ -129,6 +136,18 @@ module Charma
         pr = pdf_rect(rect)
         @pdf.stroke{
           @pdf.rectangle( [pr.x, pr.bottom], pr.w, pr.h )
+        }
+      end
+    end
+
+    # 多角形を fill する
+    # @param points [Array] 点列。[[x0,y0],[x1,y1],...]
+    # @param color [String] 色
+    def fill_polygon(points, color)
+      @pdf.save_graphics_state do
+        @pdf.fill{
+          @pdf.fill_color( pdf_color(color) )
+          @pdf.polygon(*pdf_points(points))
         }
       end
     end
