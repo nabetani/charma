@@ -11,4 +11,13 @@ module Charma
     x.respond_to?(:to_i) && x.to_i == x && 0<x
   end
 
+  def self.split_enumerable(e, &block)
+    e.each.with_object([[]]) do |o, r|
+      if block.call(o)
+        r.push([])
+      else
+        r.last.push(o)
+      end
+    end
+  end
 end
