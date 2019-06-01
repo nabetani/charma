@@ -38,6 +38,39 @@ RSpec.describe :ViolinChartSamples do
         }
       }
     )
+    n=100
+    rng = Random.new(1)
+    procs = [
+      ->(x){ x.sum/x.size.to_f },
+      ->(x){ x.max },
+      ->(x){ x.min },
+      ->(x){ x.sort[x.size/2] }
+    ]
+    opts.push(
+      bins:100,
+      series:procs.map{ |proc|
+        {
+          y:Array.new(2){ |x|
+            Array.new(n*2){ |i|
+              proc[Array.new(11){rng.rand + i % (x+1)}] * (2-x)
+            }
+          }
+        }
+      }
+    )
+    opts.push(
+      bins:100,
+      series:Array.new(4){ |s|
+        {
+          name:"s=#{s}",
+          y:[
+            Array.new(1000){ |i|
+              Array.new(11){rng.rand + i % (s+1)}.sum / (s+1)
+            }
+          ]
+        }
+      }
+    )
     Charma::Document.new do |doc|
       doc.add_page do |page|
         opts.each do |opt|
