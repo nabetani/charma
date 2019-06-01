@@ -2,10 +2,6 @@
 
 require 'spec_helper'
 
-
-module ViolinChartSpecHelper
-end
-
 RSpec.describe Charma::ViolinChart do
   S0, S1 = Array.new(2) do |s|
     values = Array.new(3) do |x|
