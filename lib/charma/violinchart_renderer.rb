@@ -85,7 +85,7 @@ module Charma
     end
 
     def draw_violins(rs, rc0, cols, yrange)
-      rcs = rc0.hsplit(*([1]*rs.size))
+      rcs = rc0.hsplit(*([1]*rs.size)).map{ |rc| rc.reduce_h(0.1) }
       rcs.zip(rs, cols).each do |rc, rr, col|
         boards = rc.vsplit(*([1]*rr.size)).reverse
         rects = boards.zip(rr).map do |board, r|
@@ -108,7 +108,8 @@ module Charma
       y_values = @chart[:series].map{ |s| s[:y] }.transpose
       violin_areas = @areas.chart.hsplit(*([1]*y_values.size))
       y_ratios = ratios_from_values( y_values, @chart.bins, yrange )
-      y_ratios.zip(violin_areas, create_colors).each do |rs, rc, cols|
+      y_ratios.zip(violin_areas, create_colors).each do |rs, rc0, cols|
+        rc = rc0.reduce_h(0.1)
         @canvas.stroke_rect(rc)
         draw_violins(rs, rc, cols, yrange)
       end
