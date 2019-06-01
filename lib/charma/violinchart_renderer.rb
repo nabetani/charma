@@ -70,7 +70,8 @@ module Charma
       }
     end
 
-    def draw_rectgroup(g, col,w)
+    def draw_rectgroup(g, col, w0)
+      w = [w0*3e-2, g.first.h/3.0].min
       lefts=[]
       rights=[]
       g.each do |rc|
@@ -79,7 +80,7 @@ module Charma
       end
       points = lefts.reverse+rights
       min, max = points.map(&:first).minmax
-      @canvas.stroke_polygon( points, color:"000", width:w*3e-2 )
+      @canvas.stroke_polygon( points, color:"000", width:w )
       @canvas.fill_polygon( points, col )
     end
 
