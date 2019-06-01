@@ -27,71 +27,21 @@ RSpec.describe Charma::ViolinChartRenderer do
     end
   end
 
-  describe "#calc_yranges" do
+  describe "#calc_yrange" do
     EXAMPLES = [
-      [[0,1.099], [0,1]], # 全て0以上なら範囲も0以上になる
-      [[-1.099, 0], [0,-1]], # 全て0以下なら範囲も0以下になる
-      [[-5.99, 5.99], [-5,5]], # 範囲が正負に渡っているなら普通に拡張される
-      [[0,1.0991], [0.0001,1.0001]], # 全て0以上なら範囲も0以上になる
-      [[-1.0991, 0], [-0.0001,-1.0001]], # 全て0以下なら範囲も0以下になる
-      [[100-0.099, 101+0.099], [100, 101]], # 範囲が余裕を持って正なら、普通に拡張される
-      [[-101-0.099, -100+0.099], [-100, -101]], # 範囲が余裕を持って負なら、普通に拡張される
+      { bins:10, y:[1,10], expected:[0.5,10.5] },
+      { bins:100, y:[0.1,10], expected:[0.05,10.05] },
+      { bins:6, y:[-4,1], expected:[-4.5, 1.5] },
+      { bins:51, y:[-4,1], expected:[-4.05, 1.05] },
+      { bins:4, y:[-4,-1], expected:[-4.5, -0.5] },
     ]
-
-    LOG_EXAMPLES = [
-      [[-0.099,1.099], [0,1]], # 正負に関係なく普通に拡張される
-      [[10-0.099,10+1.099], [10,11]], # 普通に拡張される
-      [[-0.099*10,1.099*10], [0,10]], # 正負に関係なく普通に拡張される
-    ]
-    describe "without y2" do
-      describe "linear scale" do
-        EXAMPLES.each do |expected, input|
-          it "returns #{expected.inspect} if y-values are in #{input.inspect}" do
-            chart = Charma::ViolinChart.new(series:series_yrange(input))
-            r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
-            yrange, y2range = r.calc_yranges
-            expect( yrange ).to almost_eq_ary( expected, 1e-7 )
-            expect( y2range ).to be_nil
-          end
-        end
-      end
-      describe "log scale" do
-        LOG_EXAMPLES.each do |ex, y|
-          real_ex = ex.map{ |e| 10**e }
-          real_y = y.map{ |e| 10**e }
-          it "returns #{real_ex.inspect} in log10 scale if y-values are in #{real_y.inspect}" do
-            chart = Charma::ViolinChart.new(y_scale: :log10, series:series_yrange(real_y))
-            r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
-            yrange, y2range = r.calc_yranges
-            expect( yrange ).to almost_eq_ary( real_ex, 1e-7 )
-            expect( y2range ).to be_nil
-          end
-        end
-      end
-    end
-    describe "with y2" do
-      describe "linear scale" do
-        EXAMPLES.product(EXAMPLES).each do |(ex_y,y),(ex_y2,y2)|
-          it "returns #{[ex_y,ex_y2].inspect} if y-values are in #{[y,y2].inspect}" do
-            chart = Charma::ViolinChart.new(series:series_yrange(y, y2))
-            r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
-            yrange, y2range = r.calc_yranges
-            expect( yrange ).to almost_eq_ary( ex_y, 1e-7 )
-            expect( y2range ).to almost_eq_ary( ex_y2, 1e-7 )
-          end
-        end
-      end
-      describe "linear/log scale" do
-        EXAMPLES.product(LOG_EXAMPLES).each do |(ex_y,y),(ex_y2,y2)|
-          real_ex2 = ex_y2.map{ |e| 10**e }
-          real_y2 = y2.map{ |e| 10**e }
-          it "returns #{[ex_y,real_ex2].inspect} if y-values are in #{[y,real_y2].inspect}" do
-            chart = Charma::ViolinChart.new(y2_scale: :log10, series:series_yrange(y, real_y2))
-            r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
-            yrange, y2range = r.calc_yranges
-            expect( yrange ).to almost_eq_ary( ex_y, 1e-7 )
-            expect( y2range ).to almost_eq_ary( real_ex2, 1e-7 )
-          end
+    describe "linear scale" do
+      EXAMPLES.each do |bins:, y:, expected:|
+        it "returns #{expected.inspect} if y-values are in #{y.inspect} and bins is #{bins}" do
+          chart = Charma::ViolinChart.new(bins:bins, series:series_yrange(y))
+          r = Charma::ViolinChartRenderer.new( chart, nil, rect01 )
+          yrange = r.calc_yrange
+          expect( yrange ).to almost_eq_ary( expected, 1e-7 )
         end
       end
     end
