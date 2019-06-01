@@ -140,6 +140,16 @@ module Charma
       end
     end
 
+    def stroke_polygon(points, color:"000", width:nil)
+      @pdf.save_graphics_state do
+        @pdf.stroke{
+          @pdf.line_width( width ) if width
+          @pdf.stroke_color( pdf_color(color) )
+          @pdf.polygon(*pdf_points(points))
+        }
+      end
+    end
+
     # 多角形を fill する
     # @param points [Array] 点列。[[x0,y0],[x1,y1],...]
     # @param color [String] 色
