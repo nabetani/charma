@@ -10,15 +10,13 @@ module Charma
       x_ticks:nil_or(Array),
       x_title:nil,
       y_title:nil,
-      y2_title:nil,
       y_scale:one_of( nil, :linear, :log10 ),
-      y2_scale:one_of( nil, :linear, :log10 ),
+      bins:nil_or(PositiveInteger)
     }.freeze
 
     # 系列につけられるオプション
     SERIES_OPTIONS = {
-      y:nil_or(Array, Array),
-      y2:nil_or(Array, Array),
+      y:nil_or(Array, Array, Numeric),
       name:nil
     }.freeze
     
@@ -57,21 +55,17 @@ module Charma
           validator = SERIES_OPTIONS[k]
           validator[k,v] if validator
         end
-        raise Errors::InvalidOption, "Either y or y2 is required" unless s[:y] || s[:y2]
-        raise Errors::InvalidOption, "You can not specify both y and y2" if s[:y] && s[:y2]
-      end
-      no_y = ss.none?{ |s| !!s[:y] }
-      raise Errors::InvalidOption, "At least one series has y" if no_y
-      %i(y y2).each do |sym|
-        ss.each do |s|
-          validate_series_y(sym, s[sym])
-        end
       end
     end
 
     # 第二y軸があるかどうか。ある場合は true。
     def y2?
-      !! @opts[:series].any?{ |e| e[:y2] }
+      false
+    end
+
+    # ビンの数を返す
+    def bins
+      self[:bins] || 100
     end
 
     # チャートの種別を返す
