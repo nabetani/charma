@@ -70,15 +70,30 @@ module Charma
       }
     end
 
+    def draw_rectgroup(g, col)
+      lefts=[]
+      rights=[]
+      g.each do |rc|
+        lefts += [[rc.x,rc.bottom], [rc.x, rc.y]]
+        rights += [[rc.right,rc.bottom], [rc.right, rc.y]]
+      end
+      @canvas.fill_polygon( lefts.reverse+rights, col )
+    end
+
     def draw_violins(rs, rc0, cols, yrange)
       rcs = rc0.hsplit(*([1]*rs.size))
       rcs.zip(rs, cols).each do |rc, rr, col|
         boards = rc.vsplit(*([1]*rr.size)).reverse
-        boards.zip(rr).each do |board, r|
-          next if r.zero?
-          w = board.w * r
-          cell = Rect.new( board.cx - w/2, board.y, w, board.h )
-          @canvas.fill_rect( cell, col )
+        rects = boards.zip(rr).map do |board, r|
+          if r.zero?
+            nil
+          else
+            w = board.w * r
+            Rect.new( board.cx - w/2, board.y, w, board.h )
+          end
+        end
+        Charma.split_enumerable( rects, &:nil? ).each do |g|
+          draw_rectgroup(g, col) unless g.empty?
         end
       end
     end
