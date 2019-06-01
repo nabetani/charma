@@ -72,13 +72,13 @@ module Charma
 
     def draw_violins(rs, rc0, cols, yrange)
       rcs = rc0.hsplit(*([1]*rs.size))
-      rcs.zip(rs).each do |rc, rr|
+      rcs.zip(rs, cols).each do |rc, rr, col|
         boards = rc.vsplit(*([1]*rr.size)).reverse
         boards.zip(rr).each do |board, r|
           next if r.zero?
           w = board.w * r
           cell = Rect.new( board.cx - w/2, board.y, w, board.h )
-          @canvas.fill_rect( cell, "f00" )
+          @canvas.fill_rect( cell, col )
         end
       end
     end
