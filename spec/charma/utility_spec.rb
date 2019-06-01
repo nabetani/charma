@@ -12,6 +12,10 @@ RSpec.describe "Charma utilities" do
         actual = Charma.split_enumerable(input,&:nil?)
         expect(actual).to eq( expected )
       end
+      it "splits #{input.inspect}.each into #{expected.inspect}" do
+        actual = Charma.split_enumerable(input.each,&:nil?)
+        expect(actual).to eq( expected )
+      end
     end
   end
 end
