@@ -13,9 +13,10 @@ RSpec.describe :ViolinChartSamples do
   it "simple violin chart" do |example|
     path = makepath(example, ".pdf" )
     chart = Charma::ViolinChart.new(
+      bins:10,
       series:[
         {y:[[1,2,2],[3,2,2],[3,3,2]]},
-        {y:[[3,3,5],[4,4,4],[3,4,6]]},
+        {y:[[3,3,5],[4,4,4],[3,4,10]]},
       ]
     )
     Charma::Document.new do |doc|

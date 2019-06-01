@@ -51,7 +51,7 @@ module Charma
     end
 
     # y の値のリストのリストから、ヒストグラムを作る
-    def ratios_from_values( yv, bins, yrange, y2range )
+    def ratios_from_values( yv, bins, yrange )
       y_ranges = Array.new(bins){ |ix|
         lo = yrange[0] + ( yrange[1]-yrange[0] ) * ix.to_f / bins
         hi = yrange[0] + ( yrange[1]-yrange[0] ) * (ix+1).to_f / bins
@@ -70,7 +70,7 @@ module Charma
       }
     end
 
-    def draw_violins(rs, rc0, cols, yrange, y2range)
+    def draw_violins(rs, rc0, cols, yrange)
       rcs = rc0.hsplit(*([1]*rs.size))
       rcs.zip(rs).each do |rc, rr|
         boards = rc.vsplit(*([1]*rr.size)).reverse
@@ -85,14 +85,13 @@ module Charma
 
     # チャートを描画する
     def render_chart
-      yrange, y2range = calc_yranges
-      y_values = @chart[:series].map{ |s| s[:y]||s[:y2] }.compact.transpose
+      yrange = calc_yrange
+      y_values = @chart[:series].map{ |s| s[:y] }.transpose
       violin_areas = @areas.chart.hsplit(*([1]*y_values.size))
-      bins = 10 # TODO: チャートから取ってくる
-      y_ratios = ratios_from_values( y_values, bins, yrange, y2range )
+      y_ratios = ratios_from_values( y_values, @chart.bins, yrange )
       y_ratios.zip(violin_areas, create_colors).each do |rs, rc, cols|
         @canvas.stroke_rect(rc)
-        draw_violins(rs, rc, cols, yrange, y2range)
+        draw_violins(rs, rc, cols, yrange)
       end
       y_ticks = tick_values(:y, yrange)
       draw_y_grid(:y, @areas.chart, yrange, y_ticks)
