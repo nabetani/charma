@@ -70,14 +70,17 @@ module Charma
       }
     end
 
-    def draw_rectgroup(g, col)
+    def draw_rectgroup(g, col,w)
       lefts=[]
       rights=[]
       g.each do |rc|
         lefts += [[rc.x,rc.bottom], [rc.x, rc.y]]
         rights += [[rc.right,rc.bottom], [rc.right, rc.y]]
       end
-      @canvas.fill_polygon( lefts.reverse+rights, col )
+      points = lefts.reverse+rights
+      min, max = points.map(&:first).minmax
+      @canvas.stroke_polygon( points, color:"000", width:w*3e-2 )
+      @canvas.fill_polygon( points, col )
     end
 
     def draw_violins(rs, rc0, cols, yrange)
@@ -93,7 +96,7 @@ module Charma
           end
         end
         Charma.split_enumerable( rects, &:nil? ).each do |g|
-          draw_rectgroup(g, col) unless g.empty?
+          draw_rectgroup(g, col, rc.w) unless g.empty?
         end
       end
     end
