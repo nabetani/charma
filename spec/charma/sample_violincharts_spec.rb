@@ -47,7 +47,8 @@ RSpec.describe :ViolinChartSamples do
       ->(x){ x.sort[x.size/2] }
     ]
     opts.push(
-      bins:100,
+      x_ticks:%w(foo bar),
+        bins:100,
       series:procs.map{ |proc|
         {
           y:Array.new(2){ |x|
@@ -59,6 +60,9 @@ RSpec.describe :ViolinChartSamples do
       }
     )
     opts.push(
+      x_title:"x title",
+      y_title:"y title",
+      title:"title",
       bins:100,
       series:Array.new(4){ |s|
         {
