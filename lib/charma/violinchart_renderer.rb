@@ -52,14 +52,17 @@ module Charma
 
     # y の値のリストのリストから、ヒストグラムを作る
     def ratios_from_values( yv, bins, yrange )
-      y_ranges = Array.new(bins){ |ix|
-        lo = yrange[0] + ( yrange[1]-yrange[0] ) * ix.to_f / bins
-        hi = yrange[0] + ( yrange[1]-yrange[0] ) * (ix+1).to_f / bins
+      diff = scale_value(:y, yrange[1])-scale_value(:y, yrange[0] )
+      y0 = scale_value(:y, yrange[0])
+      boundaries = Array.new(bins+1){ |ix|
+        y0 + diff * ix.to_f / bins
+      }
+      y_ranges = boundaries.each_cons(2).map{ |lo, hi|
         (lo...hi)
       }
       counts = yv.map{ |yyy|
         yyy.map{ |yy|
-          y_ranges.map{ |r| yy.count{ |y| r.include?(y) } }
+          y_ranges.map{ |r| yy.count{ |y| r.include?(scale_value(:y, y)) } }
         }
       }
       max = counts.flatten.max

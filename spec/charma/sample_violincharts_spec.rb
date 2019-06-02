@@ -10,7 +10,7 @@ RSpec.describe :ViolinChartSamples do
     File.delete( path ) if File.exist?( path )
   end
 
-  it "simple violin chart" do |example|
+  it "can be simple chart" do |example|
     path = makepath(example, ".pdf" )
     opt ={
       bins:10,
@@ -28,7 +28,7 @@ RSpec.describe :ViolinChartSamples do
     expect( File.exist?( path ) ).to be true
   end
 
-  it "various violin chart" do |example|
+  it "can be various charts" do |example|
     path = makepath(example, ".pdf" )
     opts = []
     opts.push(
@@ -102,6 +102,51 @@ RSpec.describe :ViolinChartSamples do
           }
         }
       ]
+    )
+    Charma::Document.new do |doc|
+      doc.add_page do |page|
+        opts.each do |opt|
+          page.add_chart( Charma::ViolinChart.new(opt) )
+        end
+      end
+      doc.render( path )
+    end
+    expect( File.exist?( path ) ).to be true
+  end
+
+  it "can use log10 scale" do |example|
+    path = makepath(example, ".pdf")
+    opts=[]
+    opts.push(
+      title:"Equally spaced",
+      bins:100,
+      x_ticks:%w( foo bar baz ),
+      y_scale: :log10,
+      series:Array.new(2){ |s|
+        {
+          y:Array.new(3){ |x|
+            Array.new(10){ |e|
+              10**(e*(s+1)+x)
+            }
+          }
+        }
+      }
+    )
+    deltas = [0.5,0.6,0.7]
+    opts.push(
+      title:"Random walk by multiplication",
+      bins:100,
+      x_ticks:deltas,
+      y_scale: :log10,
+      series:Array.new(4){ |s|
+        {
+          name:"seed=#{s}",
+          y:deltas.map{ |d|
+            rng = Random.new(s)
+            (1..100).inject([1]){ |acc,| acc+[acc.last*(rng.rand+d)] }
+          }
+        }
+      }
     )
     Charma::Document.new do |doc|
       doc.add_page do |page|
