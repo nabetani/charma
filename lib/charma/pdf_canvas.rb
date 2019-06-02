@@ -71,7 +71,8 @@ module Charma
     # opts[:font_size] フォントサイズ
     # opts[:align] 左右のアライメント。:left, :right, :center のいずれか
     # opts[:valign] 左右のアライメント。:top, :bottom, :center のいずれか
-    def text( t, rect, opts = {} )
+    def text( t0, rect, opts = {} )
+      t = t0.to_s
       pr = pdf_rect(rect)
       w = @pdf.width_of(t, size:1)
       h = @pdf.height_of(t, size:1)
@@ -167,7 +168,7 @@ module Charma
     # texts :: このテキストを描画できるサイズを計算する
     # rects[i] の中に texts[i] が描画できるサイズを返す
     def measure_samesize_texts( rects, texts )
-      texts.zip(rects).map{ |txt,rc|
+      texts.map(&:to_s).zip(rects).map{ |txt,rc|
         w = @pdf.width_of(txt, size:1)
         h = @pdf.height_of(txt, size:1)
         [rc.w.to_f/w, rc.h.to_f/h].min
