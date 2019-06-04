@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'ttfunk'
+
 module Charma
   # prawn を使って PDF に描画するためのクラス
   class PDFCanvas
@@ -8,6 +10,57 @@ module Charma
     # pdf :: Prawn::Document 型の、描画ターゲット
     def initialize( pdf )
       @pdf = pdf
+    end
+
+    def utf8_text(name)
+      key = [name.platform_id, name.encoding_id, name.language_id ].join("_")
+      # TODO: 文字コードの指定が不十分と思われる
+      r=case key
+      when /^0_0_/ # Unicode, Unicode 1.0, n/a
+        name.force_encoding( "UTF-16BE" )
+      when /^0_3_/ # Unicode, Unicode BMP, n/a
+        name.force_encoding( "UTF-16BE" )
+      when "1_0_0" # Macintosh, Roman, English
+        name.force_encoding( "utf-8" )
+      when "1_0_1041" # Macintosh, Roman, unknown
+        name.force_encoding( "utf-8" )
+      when "1_1_11" # Macintosh, Japanese, Japanese
+        name.force_encoding( "cp932" )
+      when "1_3_23" # Macintosh, Korean, Korean
+        name.force_encoding( "utf-8" )
+      when "3_0_1033" # Windows, Symbol, English(US)
+        name.force_encoding( "utf-8" )
+      when /^3_1_/ # Windows, Unicode BMP, *
+        name.force_encoding( "UTF-16BE" )
+      else
+        raise "unknown key #{key}" # TODO: 投げない
+      end
+      begin
+        r.encode!("utf-8")
+      end
+      r
+    end
+
+    def font=(name)
+      return unless name
+      if File.extname(name).downcase==".ttf" && File.exist?(File.expand_path(name))
+        @pdf.font(File.expand_path(name))
+        return
+      end
+      # TODO: 検索結果をキャッシュする
+      [ "/Library/Fonts/*.ttf", 
+        File.expand_path("~/Library/Fonts/*.ttf"),
+        "/System/Library/Fonts/*.ttf",
+      ].each do |pat|
+        Dir.glob(pat) do |fn|
+          file = TTFunk::File.open(fn)
+          if file.name.font_name.any?{ |n| utf8_text(n)==name }
+            @pdf.font(fn)
+            return
+          end
+        end
+      end
+      raise Charma::Errors::LogicError, "failed to find font named #{name}" # ちゃんとする
     end
 
     # ページ全体(余白除く)の矩形を返す

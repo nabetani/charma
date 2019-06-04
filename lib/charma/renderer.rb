@@ -53,6 +53,7 @@ module Charma
         raise Errors::NothingToRender, "No chart in page ##{page_number+1}"
       end
       rects = split_page( canvas.page_rect, page.charts.size )
+      canvas.font=page.font
       page.charts.zip(rects).each do |chart, rect|
         t = chart_renderer(chart.chart_type)
         t.new( chart, canvas, rect.reduce(0.1) ).render
