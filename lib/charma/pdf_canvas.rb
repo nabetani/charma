@@ -13,6 +13,8 @@ module Charma
     end
 
     def utf8_text(name)
+      # see https://docs.microsoft.com/en-us/typography/opentype/spec/name
+      # see 
       key = [name.platform_id, name.encoding_id, name.language_id ].join("_")
       # TODO: 文字コードの指定が不十分と思われる
       r=case key
@@ -30,15 +32,19 @@ module Charma
         name.force_encoding( "utf-8" )
       when "3_0_1033" # Windows, Symbol, English(US)
         name.force_encoding( "utf-8" )
+      when /^3_10_/ # Windows, Unicode full repertoire, any
+        name.force_encoding( "utf-8" )
       when /^3_1_/ # Windows, Unicode BMP, *
         name.force_encoding( "UTF-16BE" )
       else
         raise "unknown key #{key}" # TODO: 投げない
       end
       begin
-        r.encode!("utf-8")
+        r.encode("utf-8")
+      rescue Encoding::InvalidByteSequenceError=>e
+        # ignore error
+        r
       end
-      r
     end
 
     def font=(name)
@@ -51,10 +57,13 @@ module Charma
       [ "/Library/Fonts/*.ttf", 
         File.expand_path("~/Library/Fonts/*.ttf"),
         "/System/Library/Fonts/*.ttf",
-      ].each do |pat|
+        File.join( ENV["SystemRoot"], "Fonts/*.ttf" ),
+        File.expand_path("~/AppData/Local/Microsoft/Windows/Fonts/*.ttf"),
+      ].each do |pat0|
+        pat = pat0.gsub( "\\", "/" )
         Dir.glob(pat) do |fn|
           file = TTFunk::File.open(fn)
-          if file.name.font_name.any?{ |n| utf8_text(n)==name }
+          if file.name.font_name.any?{ |n| utf8_text(n)==name.encode("utf-8") }
             @pdf.font(fn)
             return
           end
