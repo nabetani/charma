@@ -81,15 +81,26 @@ RSpec.describe :PageSamples do
       end
     }
 
-    fonts = [
-      "~/Library/Fonts/NotoSans-Regular.ttf", # fullpath with "~"
-      "/System/Library/Fonts/SFNSText.ttf", # fullpath
-      "SetoFont", # postscript name
-      "Migu 1C Bold", # 正式名称
-      "IPAex明朝", # 日本語正式名称
-      "源真ゴシックP ExtraLight",
-      "源真ゴシックP Heavy"
-    ]
+    fonts = if ENV["SystemRoot"]
+      root = File.join( ENV["SystemRoot"], "Fonts" )
+      [
+        File.join( root, "HGRSKP.TTF" ),
+        File.join( root, "HGRSMP.TTF" ),
+        "游明朝 Light",
+        "源真ゴシックP ExtraLight",
+        "源真ゴシックP Heavy",
+      ]
+    else
+      [
+        "~/Library/Fonts/NotoSans-Regular.ttf", # fullpath with "~"
+        "/System/Library/Fonts/SFNSText.ttf", # fullpath
+        "SetoFont", # postscript name
+        "Migu 1C Bold", # 正式名称
+        "IPAex明朝", # 日本語正式名称
+        "源真ゴシックP ExtraLight",
+        "源真ゴシックP Heavy"
+      ]
+    end
 
     Charma::Document.new do |doc|
       fonts.each do |font|
