@@ -118,12 +118,11 @@ module Charma
     end
 
     # テキストを描画する
-    # t :: 描画する文字列
-    # rect :: この矩形内に文字列を描画する
-    # opts :: オプション
-    # opts[:font_size] フォントサイズ
-    # opts[:align] 左右のアライメント。:left, :right, :center のいずれか
-    # opts[:valign] 左右のアライメント。:top, :bottom, :center のいずれか
+    # @param [String] t 描画する文字列
+    # @param [Rect] rect この矩形内に文字列を描画する
+    # @option opts [Numeric] :font_size フォントサイズ
+    # @option opts [Symbol] :align 左右のアライメント。:left, :right, :center のいずれか
+    # @option opts [Symbol] :valign 上下のアライメント。:left, :right, :center のいずれか
     def text( t0, rect, opts = {} )
       t = t0.to_s
       pr = pdf_rect(rect)
