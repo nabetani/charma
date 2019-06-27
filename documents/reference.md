@@ -5,7 +5,8 @@
 ### `.new(font:, page_size, page_layout, &block)`
 
 #### `font`
-フォント名。未対応。
+フォント名。
+
 #### `page_size`
 デフォルトのページサイズ。
 
@@ -43,12 +44,15 @@ Charma::Document.new(略) do |doc|
 end
 ```
 
-### `#add_page( font:, page_size:, layout:, &block )`
+### `#add_page( page_title: font:, page_size:, layout:, &block )`
 
 ドキュメントにページを追加する。
 
+#### `page_title`
+ページタイトル
+
 #### `font`
-フォント名(未対応)
+フォント名
 
 #### `page_size`
 ページサイズ。形式は `Document.new` の `page_size` と同様
@@ -93,7 +97,6 @@ end
 ## `Charma::Page`
 
 `Document#add_page` の返戻値またはブロック引数の値として得られる。
-
 
 ### `#add_chart(chart)`
 
