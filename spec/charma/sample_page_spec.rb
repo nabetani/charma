@@ -10,6 +10,34 @@ RSpec.describe :PageSamples do
     File.delete( path ) if File.exist?( path )
   end
 
+  it "can have title" do |example|
+    path = makepath(example, ".pdf" )
+    charts =[
+      Charma::BarChart.new(
+        title:"bar chart",
+        series:[{y:[1,4,5]},{y:[7,9,-1]},{y:[2,8,6]}]
+      ),
+      Charma::ScatterChart.new(
+        title:"scatter chart",
+        series:[
+          {name: "hoge", xy: [[9, 4], [8, 5], [1, 6], [3, 2], [7, 10]]},
+          {name: "fuga", xy: [[7, 8], [1, 5], [10, 3], [2, 4], [6, 9]]},
+        ]
+      ),
+    ]
+    Charma::Document.new do |doc|
+      doc.add_page(page_title: "page title", page_size:"A4", page_layout: :landscape) do |page|
+        charts.each do |chart|
+          page.add_chart(chart)
+        end
+      end
+      doc.render( path )
+    end
+    expect( File.exist?( path ) ).to be true
+  end
+  
+
+
   it "has various page sizes" do |example|
     path = makepath(example, ".pdf" )
     chart = Charma::ScatterChart.new(
@@ -82,8 +110,7 @@ RSpec.describe :PageSamples do
     }
 
     fonts = [
-      "~/Library/Fonts/NotoSans-Regular.ttf", # fullpath with "~"
-      "/System/Library/Fonts/SFNSText.ttf", # fullpath
+      "~/Library/Fonts/ipaexg.ttf", # fullpath with "~"
       "SetoFont", # postscript name
       "Migu 1C Bold", # 正式名称
       "IPAex明朝", # 日本語正式名称

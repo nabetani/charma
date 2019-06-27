@@ -44,19 +44,33 @@ module Charma
       }.flatten
     end
 
-    # ページを描画する
-    # canvas :: 描画ターゲット
-    # page :: 描画するページの情報
-    # page_number :: ページ番号(0-origin)
-    def render_page( canvas, page, page_number )
-      if page.charts.empty?
-        raise Errors::NothingToRender, "No chart in page ##{page_number+1}"
-      end
-      rects = split_page( canvas.page_rect, page.charts.size )
+    # ページ内のチャートを描画する
+    # @param [PDFCanvas, SVGCanvas] canvas 描画ターゲット
+    # @param [Page] page 描画するページの情報
+    # @param [Rect] charts_rect 全チャートを含む矩形
+    def render_page_charts( canvas, page, charts_rect )
+      rects = split_page( charts_rect, page.charts.size )
       canvas.font=page.font
       page.charts.zip(rects).each do |chart, rect|
         t = chart_renderer(chart.chart_type)
         t.new( chart, canvas, rect.reduce(0.1) ).render
+      end
+    end
+
+    # ページを描画する
+    # @param [PDFCanvas, SVGCanvas] canvas 描画ターゲット
+    # @param [Page] page 描画するページの情報
+    # @param [Numeric] page_number ページ番号(0-origin)
+    def render_page( canvas, page, page_number )
+      if page.charts.empty?
+        raise Errors::NothingToRender, "No chart in page ##{page_number+1}"
+      end
+      if page.title
+        title, charts = canvas.page_rect.vsplit(1,10)
+        canvas.text(page.title, title )
+        render_page_charts( canvas, page, charts )
+      else
+        render_page_charts( canvas, page, canvas.page_rect )
       end
     end
   end
