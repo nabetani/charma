@@ -182,7 +182,7 @@ module Charma
     def seq_colors(n)
       case n
       when 1..6
-        %w(00f f00 008000 f0f 0ee cc0)[0,n]
+        %w(00f f00 008000 f0f 0cc aa0)[0,n]
       else
         f = lambda{ |t0|
           v = lambda{ |t|
