@@ -19,13 +19,13 @@ RSpec.describe Charma::ScatterChart do
       expect(c[:y_title]).to eq( "Y TITLE")
     end
 
-    it "will raise if no series" do
+    it "raises if no series" do
       expect{
         Charma::ScatterChart.new({})
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
-    it "will raise unless series is Array of Hash" do
+    it "raises unless series is Array of Hash" do
       expect{
         Charma::ScatterChart.new(series:123)
       }.to raise_error( Charma::Errors::InvalidOption )
@@ -37,13 +37,13 @@ RSpec.describe Charma::ScatterChart do
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
-    it "will raise if series is empty" do
+    it "raises if series is empty" do
       expect{
         Charma::ScatterChart.new(series:[])
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
-    it "will raise if series.xy is NOT Array of pair of Numeric" do
+    it "raises if series.xy is NOT Array of pair of Numeric" do
       [
         %i(foo bar),
         [1,2,3],
@@ -57,7 +57,7 @@ RSpec.describe Charma::ScatterChart do
       end
     end
 
-    it "will raise if series.xy2 is NOT Array of pair of Numeric" do
+    it "raises if series.xy2 is NOT Array of pair of Numeric" do
       [
         %i(foo bar),
         [1,2,3],
@@ -71,34 +71,35 @@ RSpec.describe Charma::ScatterChart do
       end
     end
 
-    it "will raise if a series has both xy and xy2" do
+    it "raises if a series has both xy and xy2" do
       xy = xy2 = [[1,2],[3,4],[5,6]]
       expect{
         Charma::ScatterChart.new(series:[{xy:xy,xy2:xy2}])
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
-    it "will raise if no series has xy" do
+    it "raises if no series has xy" do
       xy2 = [[1,2],[3,4],[5,6]]
       expect{
         Charma::ScatterChart.new(series:[{xy2:xy2}])
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
-    it "will raise if there is unexpected key" do
+    it "raises if there is unexpected key" do
       xy = [[1,2],[3,4],[5,6]]
       expect{
         Charma::ScatterChart.new(series:[{xy:xy}], unexpected:"value")
       }.to raise_error( Charma::Errors::InvalidOption )
     end
 
-    it "will raise if series has unexpected key" do
+    it "raises if series has unexpected key" do
       xy = [[1,2],[3,4],[5,6]]
       expect{
         Charma::ScatterChart.new(series:[{xy:xy, unexpected:"value"}])
       }.to raise_error( Charma::Errors::InvalidOption )
     end
   end
+  
   describe "#chart_type" do
     it "returns :scatter_chart" do
       c = Charma::ScatterChart.new(
