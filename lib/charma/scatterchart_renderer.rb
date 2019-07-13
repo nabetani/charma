@@ -99,11 +99,20 @@ module Charma
       radius = point_radius(area)
       @chart[:series].zip(cols).each do |s,col|
         positions, yaxis = s[:xy] ? [s[:xy], :y] : [s[:xy2], :y2]
+        dot = [nil, :dot, :dot_and_line, :line_and_dot].include?(s[:style])
+        line = [:line, :dot_and_line, :line_and_dot].include?(s[:style])
         yrange = yaxis==:y ? y1range : y2range
+        points = []
         positions.each do |pos|
           ax = abs_x_position(pos[0], area, xrange)
           ay = abs_y_position(yaxis, pos[1], area, yrange)
-          @canvas.fill_circle( ax, ay, radius, col )
+          points.push( [ax, ay ] )
+          if dot
+            @canvas.fill_circle( ax, ay, radius, col )
+          end
+        end
+        if line
+          @canvas.polyline( points, radius, col )
         end
       end
     end

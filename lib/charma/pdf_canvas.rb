@@ -169,6 +169,25 @@ module Charma
       end
     end
 
+    # 折れ線を描画する
+    # @param [Array<Array<Numeric>>] pts x, y 値の配列。
+    # @param [Numeric] width 線の幅
+    # @param [String] color 線の色
+    def polyline( pts0, width, color )
+      pts = pdf_points(pts0)
+      @pdf.save_graphics_state do
+        @pdf.fill_color 0, 0, 0, 0
+        @pdf.stroke_color(pdf_color(color))
+        @pdf.stroke do
+          @pdf.line_width = width
+          @pdf.move_to(pts[0])
+          (1...pts.size).each do |ix|
+            @pdf.line_to(pts[ix])
+          end
+        end
+      end
+    end
+
     def fill_circle( cx, cy, r, color )
       @pdf.save_graphics_state do
         y = pdf_y(cy)
