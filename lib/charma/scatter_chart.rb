@@ -19,6 +19,7 @@ module Charma
     SERIES_OPTIONS = {
       xy:nil_or(Array),
       xy2:nil_or(Array),
+      style:one_of( nil, :line, :dot, :dot_and_line, :line_and_dot ),
       name:nil
     }.freeze
 
@@ -38,6 +39,7 @@ module Charma
     # Hash のキーと値は以下の通り：
     # :xy [Array] 数値の配列の配列。数値は順に x, y。"xy: [[3, 1], [4, 1], [5, 9]]" のような感じ。第一y軸を使う。
     # :xy2 [Array] :xy と同様だが、第二y軸を使う。
+    # :style [Symbol] 描画方法。以下のいずれか。nil, :line, :dot, :dot_and_line, :line_and_dot
     # :name [String] 系列の名前(凡例に使う)
     def initialize(opts)
       opts.each do |k,v|

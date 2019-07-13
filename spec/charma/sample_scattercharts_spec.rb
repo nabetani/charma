@@ -85,6 +85,48 @@ RSpec.describe :ScatterChartSamples do
     expect( File.exist?( path ) ).to be true
   end
 
+  it "chart with styles" do |example|
+    path = makepath(example, ".pdf" )
+    values = ->(type){
+      size = 20*2**type
+      Array.new(size){ |ix|
+        t=ix*Math::PI*2/size
+        r = (ix+size)/(2-Math.cos(t*(3+type*2)))/size
+        [Math.cos(t)*r+type, Math.sin(t)*r]
+      }
+    }
+    chart = Charma::ScatterChart.new(
+      title: "many styles",
+      series: [
+        {xy:values[0], name:"none"},
+        %i(dot line dot_and_line line_and_dot).map.with_index(1){ |s,ix|
+          { xy:values[ix], name:s, style:s }
+        }
+      ].flatten
+    )
+    Charma::Document.new do |doc|
+      doc.add_page do |page|
+        page.add_chart( chart )
+      end
+      doc.add_page do |page|
+        %i(dot line dot_and_line line_and_dot).each do |s|
+          4.times do |ix|
+            page.add_chart( Charma::ScatterChart.new(
+              title: s,
+              series: [
+                xy:values[ix],
+                style: s, 
+                name: s
+              ]
+            ) )
+          end
+        end
+      end
+      doc.render( path )
+    end
+    expect( File.exist?( path ) ).to be true
+  end
+
   it "log10 scale with y2" do |example|
     path = makepath(example, ".pdf" )
     charts = Array.new(8) do |ix|
@@ -105,6 +147,7 @@ RSpec.describe :ScatterChartSamples do
         ]
       )
     end
+    
     Charma::Document.new do |doc|
       doc.add_page do |page|
         charts.each do |chart|
