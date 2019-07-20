@@ -111,9 +111,13 @@ module Charma
       y_values = @chart[:series].map{ |s| s[:y] }.transpose
       violin_areas = @areas.chart.hsplit(*([1]*y_values.size))
       y_ratios = ratios_from_values( y_values, @chart.bins, yrange )
+      draw_group_background = 1<y_values.size && 
       y_ratios.zip(violin_areas, create_colors).each do |rs, rc0, cols|
         rc = rc0.reduce_h(0.1)
-        @canvas.stroke_rect(rc)
+        @canvas.fill_rect(rc, "eee")
+        if draw_group_background
+          @canvas.stroke_rect(rc)
+        end
         draw_violins(rs, rc, cols, yrange)
       end
       y_ticks = tick_values(:y, yrange)
@@ -121,7 +125,7 @@ module Charma
       draw_y_ticks(:y, @areas.y_ticks, yrange, y_ticks)
       draw_y_marks(:y, @areas.y_marks, yrange, y_ticks)
       if @chart.y2?
-        y2_ticks = tick_values(:y2, y2range)
+        y2_draw_group_backgroundticks = tick_values(:y2, y2range)
         draw_y_ticks(:y2, @areas.y2_ticks, y2range, y2_ticks)
         draw_y_marks(:y2, @areas.y2_marks, y2range, y2_ticks)
       end
