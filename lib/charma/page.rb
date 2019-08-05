@@ -17,7 +17,7 @@ module Charma
       page_layout: nil,
       &block
     )
-      @title = page_title.to_s
+      @title = page_title && page_title.to_s
       @charts = []
       @font = font
       @size = parse_papersize( page_size, page_layout )
