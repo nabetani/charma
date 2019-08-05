@@ -113,9 +113,9 @@ module Charma
         h = @pdf.height_of(t, size:1)
         font_size = [pr.w.to_f/w ,pr.h.to_f/h].min
         # TODO: bounding box の描画を撤去する
-        @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
-          @pdf.transparent(1) { @pdf.stroke_bounds }
-        end
+        # @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
+        #   @pdf.transparent(1) { @pdf.stroke_bounds }
+        # end
         @pdf.text_box(
           t,
           at: [pr.x, pr.bottom],
@@ -141,9 +141,9 @@ module Charma
       font_size = opts[:font_size] || [pr.w.to_f/w, pr.h.to_f/h].min * 0.95
 
       # TODO: remove bounding box
-      @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
-        @pdf.transparent(1) { @pdf.stroke_bounds }
-      end
+      # @pdf.bounding_box([pr.x, pr.bottom], width:pr.w, height:pr.h ) do
+      #   @pdf.transparent(1) { @pdf.stroke_bounds }
+      # end
 
       @pdf.text_box(
         t,
