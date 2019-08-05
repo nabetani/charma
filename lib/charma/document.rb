@@ -30,6 +30,7 @@ module Charma
     # @param [String, nil] font フォント名。フルパスでも、PostScript名でも、正式名でも。
     # @param [String, Array(Numeric,Numeric), nil] page_size ページサイズ。"A4" のような形式か、"210x297" のような形式。あるいは [100,200] のような配列
     # @param [Symbol, nil] page_layout :landscape (横長) または :portrait (縦長)。あるいは nil。
+    # @param [String, nil] note ページ下部のノート
     # ブロック引数を取り、作られたページを引数としたブロック呼び出しになる。
     # @return [Page] つくられたページ
     def add_page(
@@ -37,6 +38,7 @@ module Charma
       font:nil,
       page_size:nil,
       page_layout:nil,
+      note:nil,
       &block
     )
       font ||= @font
@@ -45,7 +47,8 @@ module Charma
         page_title: page_title,
         font:(font||@font),
         page_size:(page_size||@page_size),
-        page_layout:(page_layout||@page_layout)
+        page_layout:(page_layout||@page_layout),
+        note:note
       )
       block[page] if block
       @pages.push page

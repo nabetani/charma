@@ -66,13 +66,12 @@ module Charma
       if page.charts.empty?
         raise Errors::NothingToRender, "No chart in page ##{page_number+1}"
       end
-      if page.title
-        title, charts = canvas.page_rect.vsplit(1,10)
-        canvas.text(page.title, title )
-        render_page_charts( canvas, page, charts )
-      else
-        render_page_charts( canvas, page, canvas.page_rect )
-      end
+      title_h = page.title ? 1 : 0
+      note_h = page.note ? 1 : 0
+      title, charts, note = canvas.page_rect.vsplit(title_h, 10, note_h)
+      canvas.text(page.title, title) if page.title
+      canvas.text(page.note, note) if page.note
+      render_page_charts( canvas, page, charts )
     end
   end
 end
