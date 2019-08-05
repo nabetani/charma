@@ -113,7 +113,7 @@ module Charma
       y_ratios = ratios_from_values( y_values, @chart.bins, yrange )
       y_ratios.zip(violin_areas, create_colors).each do |rs, rc0, cols|
         rc = rc0.reduce_h(0.1)
-        @canvas.stroke_rect(rc)
+        @canvas.fill_rect(rc, "eee" )
         draw_violins(rs, rc, cols, yrange)
       end
       y_ticks = tick_values(:y, yrange)
