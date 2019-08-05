@@ -23,6 +23,9 @@ module Charma
     # ※ 対数目盛に対応する
     # y2 には対応しない。
     def calc_yrange
+      if @chart[:y_range]
+        return @chart[:y_range]
+      end
       v = @chart[:series].flat_map{ |s|
         s[:y]&.map{ |vals| 
           vals.flatten.map{ |val|
