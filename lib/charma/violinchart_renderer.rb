@@ -85,7 +85,6 @@ module Charma
         rights += [[rc.right,rc.bottom], [rc.right, rc.y]]
       end
       points = lefts.reverse+rights
-      min, max = points.map(&:first).minmax
       @canvas.stroke_polygon( points, color:"000", width:w )
       @canvas.fill_polygon( points, col )
     end
