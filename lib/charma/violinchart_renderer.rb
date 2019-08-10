@@ -118,7 +118,6 @@ module Charma
         rc = rc0.reduce_h(0.1)
         if draw_group_background
           @canvas.fill_rect(rc, "eee")
-          @canvas.stroke_rect(rc)
         end
         draw_violins(rs, rc, cols, yrange)
       end
