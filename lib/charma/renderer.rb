@@ -32,13 +32,14 @@ module Charma
     # total :: ページの矩形
     # count :: 何個に分割するか
     def split_page( total, count )
-      xcount = (1..count ).min_by{ |w|
+      xcount0 = (1..count ).min_by{ |w|
         h = ( count.to_r / w.to_r ).ceil
         cw = total.w.to_f / w
         ch = total.h.to_f / h
         Math.log(cw/ch).abs
       }
-      ycount = ( count.to_r / xcount.to_r ).ceil
+      ycount = ( count.to_r / xcount0.to_r ).ceil
+      xcount = ( count.to_r / ycount ).ceil
       total.vsplit( *Array.new(ycount, 1) ).map{ |rc|
         rc.hsplit( *Array.new(xcount, 1) )
       }.flatten
@@ -65,13 +66,12 @@ module Charma
       if page.charts.empty?
         raise Errors::NothingToRender, "No chart in page ##{page_number+1}"
       end
-      if page.title
-        title, charts = canvas.page_rect.vsplit(1,10)
-        canvas.text(page.title, title )
-        render_page_charts( canvas, page, charts )
-      else
-        render_page_charts( canvas, page, canvas.page_rect )
-      end
+      title_h = page.title ? 1 : 0
+      note_h = page.note ? 1 : 0
+      title, charts, note = canvas.page_rect.vsplit(title_h, 10, note_h)
+      canvas.text(page.title, title) if page.title
+      canvas.text(page.note, note) if page.note
+      render_page_charts( canvas, page, charts )
     end
   end
 end

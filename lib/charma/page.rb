@@ -9,15 +9,18 @@ module Charma
     # @param [String, nil] font フォント名。フルパスでも、PostScript名でも、正式名でも。
     # @param [String, Array(Numeric,Numeric), nil] page_size ページサイズ。"A4" のような形式か、"210x297" のような形式。あるいは [100,200] のような配列
     # @param [Symbol, nil] page_layout :landscape (横長) または :portrait (縦長)。あるいは nil。
+    # @param [String, nil] note ページ下部のノート
     # ブロック引数を取り、自分を引数としたブロック呼び出しになる
     def initialize(
       page_title: nil,
       font:nil,
       page_size:DEFAULT_PAGE_SIZE,
       page_layout: nil,
+      note:nil,
       &block
     )
-      @title = page_title.to_s
+      @title = page_title && page_title.to_s
+      @note = note && note.to_s
       @charts = []
       @font = font
       @size = parse_papersize( page_size, page_layout )
@@ -26,6 +29,9 @@ module Charma
 
     # ページタイトル
     attr_reader :title
+
+    # ページノート
+    attr_reader :note
 
     # ページサイズ。複素数。実部が横幅。虚部が縦幅。
     attr_reader :size

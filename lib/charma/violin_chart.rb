@@ -10,6 +10,7 @@ module Charma
       x_ticks:nil_or(Array),
       x_title:nil,
       y_title:nil,
+      y_range:nil_or(Array),
       y_scale:one_of( nil, :linear, :log10 ),
       # with_calc:one_of( nil, :series, :x, :all ) # TODO: 幅の計算方法を選べるようにする
       bins:nil_or(PositiveInteger)

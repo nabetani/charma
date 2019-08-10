@@ -23,6 +23,9 @@ module Charma
     # ※ 対数目盛に対応する
     # y2 には対応しない。
     def calc_yrange
+      if @chart[:y_range]
+        return @chart[:y_range]
+      end
       v = @chart[:series].flat_map{ |s|
         s[:y]&.map{ |vals| 
           vals.flatten.map{ |val|
@@ -82,7 +85,6 @@ module Charma
         rights += [[rc.right,rc.bottom], [rc.right, rc.y]]
       end
       points = lefts.reverse+rights
-      min, max = points.map(&:first).minmax
       @canvas.stroke_polygon( points, color:"000", width:w )
       @canvas.fill_polygon( points, col )
     end

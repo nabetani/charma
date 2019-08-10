@@ -43,7 +43,7 @@ module Charma
         @pages.each.with_index do |page,ix|
           pdf.start_new_page( create_opts(page) ) if ix != 0
           render_page(PDFCanvas.new(pdf), page, ix)
-          pdf.stroke_axis # TODO: remove this line
+          #pdf.stroke_axis # TODO: remove this line
         end
       end
     end
