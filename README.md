@@ -64,6 +64,14 @@ Everyone interacting in the Charma project’s codebases, issue trackers, chat r
 
 ## Change logs
 
+### v0.2.0
+
+2019.8.?
+
+* 全面的に書き直した。
+* 後方互換性なし。
+* LineChart 一旦廃止( ScatterChart で線が描ける )
+
 ### v0.1.2
 
 2019.3.25
