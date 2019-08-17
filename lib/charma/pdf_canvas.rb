@@ -23,16 +23,20 @@ module Charma
       when /^0_3_/ # Unicode, Unicode BMP, n/a
         name.force_encoding( "UTF-16BE" )
       when "1_0_0" # Macintosh, Roman, English
-        name.force_encoding( "utf-8" )
+        name.force_encoding( "MacRoman" )
       when "1_0_1041" # Macintosh, Roman, unknown
-        name.force_encoding( "utf-8" )
+        name.force_encoding( "MacRoman" )
       when "1_1_11" # Macintosh, Japanese, Japanese
+        # MacJapanese にすると「Encoding::ConverterNotFoundError: code converter not found (MacJapanese to UTF-8)」になるので仕方なく cp932
         name.force_encoding( "cp932" )
       when "1_3_23" # Macintosh, Korean, Korean
+        # FIXME: I do not know what to do.
         name.force_encoding( "utf-8" )
       when "3_0_1033" # Windows, Symbol, English(US)
+        # FIXME: I do not know what to do.
         name.force_encoding( "utf-8" )
       when /^3_10_/ # Windows, Unicode full repertoire, any
+        # FIXME: I do not know what to do.
         name.force_encoding( "utf-8" )
       when /^3_1_/ # Windows, Unicode BMP, *
         name.force_encoding( "UTF-16BE" )
