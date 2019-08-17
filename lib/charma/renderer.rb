@@ -6,15 +6,15 @@ module Charma
   class Renderer
 
     # Renderer を構築する
-    # pages :: ページ情報のリスト
-    # opts :: オプション
+    # @param[Array<Page>] pages ページ情報のリスト
+    # @param[Hash] opts オプション
     def initialize( pages, opts )
       @pages = pages
       @opts = opts
     end
 
     # チャートタイプに対応するチャートを描画するクラスを返す
-    # ct :: チャートタイプ
+    # @param [Symbol] ct チャートタイプ。 :bar_chart, :scatter_chart, :violin_chart のいずれか。
     def chart_renderer(ct)
       case ct
       when :bar_chart
@@ -29,8 +29,8 @@ module Charma
     end
 
     # ページをいい感じに分割する
-    # total :: ページの矩形
-    # count :: 何個に分割するか
+    # @param [Rect] total ページの矩形
+    # @param [Numeric] count 何個に分割するか
     def split_page( total, count )
       xcount0 = (1..count ).min_by{ |w|
         h = ( count.to_r / w.to_r ).ceil

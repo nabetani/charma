@@ -43,11 +43,11 @@ module Charma
     end
     
     # 棒を描画する
-    # ys :: y の値のリスト。ys[0] が最初の系列の y の値。
-    # rc :: 一連のバーを含む矩形
-    # cols :: 色のリスト。cols[0] が最初の系列の色。
-    # yrange :: 第一y軸の値の範囲。
-    # y2range :: 第二y軸の値の範囲。
+    # @param [Array<Array<Numeric>>] ys y の値のリスト。ys[0] が最初の系列の y の値。
+    # @param [Rect] rc 一連のバーを含む矩形
+    # @param [Array] cols 色のリスト。cols[0] が最初の系列の色。
+    # @param [Array<Numeric>] yrange 第一y軸の値の範囲。
+    # @param [Array<Numeric>] y2range 第二y軸の値の範囲。
     def draw_bars( ys, rc, cols, yrange, y2range )
       ratio = 0.75
       _, bars, = rc.hsplit( (1-ratio)/2, ratio, (1-ratio)/2 )

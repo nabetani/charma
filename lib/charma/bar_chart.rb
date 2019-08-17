@@ -23,17 +23,18 @@ module Charma
     }.freeze
 
     # BarChart の情報を作る。初期化する
-    # :title :: グラフのタイトル
-    # :series :: 系列
-    # :x_ticks :: x軸につけるラベル
-    # :x_title :: x軸のタイトル(グラフ下端)
-    # :y_title :: y軸のタイトル(グラフ左端)
+    # @param [Hash] opts 初期化オプション
+    # @option opts[String] :title グラフのタイトル
+    # @option opts[Array<Hash>] :series 系列
+    # @option opts[Array<String>] :x_ticks x軸につけるラベル
+    # @option opts[String] :x_title x軸のタイトル(グラフ下端)
+    # @option opts[String] :y_title y軸のタイトル(グラフ左端)
     #
     # 系列は Hash の Array になっている。
     # Hash のキーと値は以下の通り：
-    # :y :: yの値のリスト。数値の配列。左側のy軸を利用
-    # :y2 :: yの値のリスト。数値の配列。右側のy軸を利用
-    # :name :: 系列の名前(凡例に使う)
+    # opts[:series][x][:y] -> yの値のリスト。数値の配列。左側のy軸を利用
+    # opts[:series][x][:y2] -> y yの値のリスト。数値の配列。右側のy軸を利用
+    # opts[:series][x][:name] -> y 系列の名前(凡例に使う)
     def initialize(opts)
       opts.each do |k,v|
         raise Errors::InvalidOption, "#{k.inspect} is not valid key" unless OPTIONS.has_key?(k)

@@ -43,8 +43,9 @@ module Charma
     attr_reader :font
 
     # ページサイズを計算する
-    # size :: ページサイズ。page_layout が nil の場合、実部が横幅。虚部が縦幅。
-    # page_layout :: :landscape または :portrait または nil
+    # @param [Complex] size ページサイズ。page_layout が nil の場合、実部が横幅。虚部が縦幅。
+    # @param [Symbol, nil] page_layout :landscape または :portrait または nil
+    # @return [Complex] ページサイズ。実部が横幅。虚部が縦幅。
     def adjust_layout(size, page_layout)
       s,l = size.rectangular.minmax
       case page_layout
@@ -60,8 +61,9 @@ module Charma
     end
 
     # 紙のサイズを示す入力を、紙のサイズを示す複素数に変換する
-    # page_size :: "A4" だったり "200x300" だったり [100,200] だったりするもの
-    # page_layout :: :landscape または :portrait または nil
+    # @param [String, Array<Numeric>] page_size "A4" だったり "200x300" だったり [100,200] だったりするもの
+    # @param [Symbol, nil] page_layout :landscape または :portrait または nil
+    # @return [Complex] ページサイズ。実部が横幅。虚部が縦幅。単位はミリ。
     def parse_papersize( page_size, page_layout )
       case page_size
       when /^[AB]\d+$/

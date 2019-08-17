@@ -6,7 +6,7 @@ module Charma
   Rect = Struct.new( :x, :y, :w, :h ) do
 
     # 垂直(上下)に分割する
-    # rel_hs :: 相対的な高さのリスト
+    # @param[ Array<Numeric> ] rel_hs 相対的な高さのリスト
     def vsplit( *rel_hs )
       rel_sum = rel_hs.sum
       abs_y = y.to_f
@@ -19,7 +19,7 @@ module Charma
     end
 
     # 水平(左右)に分割する
-    # rel_ws :: 相対的な幅のリスト
+    # @param [Array<Numeric>] rel_ws 相対的な幅のリスト
     def hsplit( *rel_ws )
       rel_sum = rel_ws.sum
       abs_x = x.to_f
@@ -32,14 +32,14 @@ module Charma
     end
 
     # 自分を縮小した矩形を返す。中心を維持して、上下左右から同じ長さを減じる。
-    # ratio :: 縮小する割合。0.1 とかを想定。
+    # @param [Numeric] ratio 縮小する割合。0.1 を指定すると、上下左右から 10% 減らして、80%✕80% の大きさになる。
     def reduce( ratio )
       len = [w,h].min*ratio/2
       Rect.new( x+len, y+len, w-len*2, h-len*2 )
     end
 
     # 自分を左右方向に縮小した矩形を返す。中心を維持して、左右から同じ長さを減じる。
-    # ratio :: 縮小する割合。0.1 とかを想定。
+    # @param [Numeric] ratio 縮小する割合。0.1 を指定すると、左右から 10% 減らす。
     def reduce_h( ratio )
       len = w*ratio/2
       Rect.new( x+len, y, w-len*2, h )

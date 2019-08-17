@@ -4,9 +4,9 @@ module Charma
   # Charma Document
   class Document
     # ドキュメントを生成
-    # font :: デフォルトフォント名。String。
-    # page_size :: デフォルトページサイズ。"A4" のような形式か、"210x297" のような形式。あるいは [100,200] のような配列
-    # page_layout :: :landscape (横長) または :portrait (縦長)。あるいは nil。
+    # @param [String] font デフォルトフォント名。String。
+    # @param [String, Array<Numeric>] page_size デフォルトページサイズ。"A4" のような形式か、"210x297" のような形式。あるいは [100,200] のような配列
+    # @param [Symbol, nil] page_layout :landscape (横長) または :portrait (縦長)。あるいは nil。
     # ブロック引数を取り、自分を引数としたブロック呼び出しになる
     def initialize(
       font:nil,
@@ -56,7 +56,8 @@ module Charma
     end
 
     # ファイル名からファイルタイプ( :pdf または :svg )を得る。
-    # filename :: ファイル名。
+    # @param [String] filename ファイル名。
+    # @return [Symbol] ファイルタイプ。 :pdf または :svg
     def filetype_from( filename )
       ext = File.extname(filename)
       case ext.downcase
@@ -70,7 +71,7 @@ module Charma
     end
 
     # ファイルタイプに応じたレンダラを返す
-    # ft :: :pdf または :svg。
+    # @param [Symbol] ft :pdf または :svg。
     def renderer_for( ft )
       case ft
       when :pdf

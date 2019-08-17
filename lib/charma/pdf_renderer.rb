@@ -6,8 +6,8 @@ module Charma
   class PDFRenderer < Renderer
 
     # PDFRenderer を構築する
-    # pages :: ページ情報のリスト
-    # opts :: オプション
+    # @param [Array<Page>] pages ページ情報のリスト
+    # @param [Hash] opts オプション
     def initialize( pages, opts )
       super
     end
@@ -18,7 +18,7 @@ module Charma
     end
 
     # ページ情報をもとに Prawn にわたすオプションを作る
-    # page :: ページ情報
+    # @param[Array<Page>] page ページ情報
     def create_opts( page )
       r={}
       size = page.size.rectangular.map{ |mm| mm_to_pdfpoint(mm) }
@@ -37,7 +37,7 @@ module Charma
     end
 
     # PDFを生成する
-    # filename :: 出力ファイル名
+    # @param [String] filename 出力ファイル名
     def render( filename )
       Prawn::Document.generate(filename, prawn_opts) do |pdf|
         @pages.each.with_index do |page,ix|

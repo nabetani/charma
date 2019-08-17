@@ -22,9 +22,9 @@ module Charma
   class ChartRenderer
 
     # チャートを描画するオブジェクトを生成する
-    # chart :: チャートに関する情報
-    # canvas :: チャートの描画ターゲット。PDF か SVG。
-    # area :: チャートが占める領域。Rect 型。
+    # @param [Object] chart チャートに関する情報
+    # @param [PDFCanvas, SVGCanvas] canvas チャートの描画ターゲット。
+    # @param [Rect] area チャートが占める領域。Rect 型。
     def initialize( chart, canvas, area )
       @chart = chart
       @canvas = canvas
@@ -32,6 +32,9 @@ module Charma
       prepare_areas
     end
 
+    # 軸に応じたスケーリングの種類を返す
+    # @param [Symbol] axis 軸。 :x, :y, :y2 のいずれか
+    # @return [Symbol] :linear または :log10
     def scale_type(axis)
       case axis
       when :x
@@ -46,8 +49,9 @@ module Charma
     end
 
     # 対数グラフに対応するために、生の値からスケール変更済みの値を求める
-    # axis :: 軸の名前。:y, :y2, :x のいずれか
-    # v :: 生の値
+    # @param [Symbol] axis 軸。:y, :y2, :x のいずれか
+    # @param [Numeric] v 生の値。
+    # @return [Numeric] スケール変更済みの値
     def scale_value(axis, v)
       case scale_type(axis)
       when :log10
@@ -60,8 +64,9 @@ module Charma
     end
 
     # 対数グラフに対応するために、スケール変更済みの値から生の値を求める
-    # axis :: 軸の名前。:y, :y2, :x のいずれか
-    # v :: スケール変更済みの値
+    # @param [Symbol] axis 軸。:y, :y2, :x のいずれか
+    # @param [Numeric] v スケール変更済みの値
+    # @return [Nmeric] スケール変更前の値
     def unscale_value( axis, v )
       case scale_type(axis)
       when :log10
@@ -83,8 +88,9 @@ module Charma
     end
 
     # グリッドに使う値のリストを求める
-    # axis :: 軸の名前。:x, :y, :y2 のいずれか
-    # range :: その軸で扱う値の範囲
+    # @param [Symbol] axis 軸。:x, :y, :y2 のいずれか
+    # @param [Array<Numeric>] range その軸で扱う値の範囲
+    # @return [Array<Numeric>] グリッドで使う値のリスト
     def tick_values(axis, range)
       min, max = range.minmax.map{ |e| scale_value( axis, e ) }
       unit = tick_unit(max - min)
@@ -94,8 +100,8 @@ module Charma
     end
 
     # y軸の値ラベル( y_ticks )を描画する
-    # area :: y_ticks を描画する領域
-    # ticks :: y_ticks に描画する値のリスト
+    # @param [Rect] area y_ticks を描画する領域
+    # @param [Array<Numeric>] ticks y_ticks に描画する値のリスト
     def draw_y_ticks(axis, area, range, ticks)
       h = (area.h / ticks.size) * 0.7
       rects = ticks.map{ |v|
@@ -108,8 +114,8 @@ module Charma
     end
 
     # y軸の値ラベル( x_ticks )を描画する
-    # area :: x_ticks を描画する領域
-    # ticks :: x_ticks に描画する値のリスト
+    # @param [Rect] area x_ticks を描画する領域
+    # @param [Array<Numeric>] ticks x_ticks に描画する値のリスト
     def draw_x_ticks(area, range, ticks)
       w = (area.w / ticks.size) * 0.7
       rects = ticks.map{ |v|
@@ -122,10 +128,10 @@ module Charma
     end
 
     # チャート内の水平線を描画する
-    # area :: チャートの領域
-    # range :: y の値の範囲
-    # ticks :: 横線を描画する値のリスト
-    # y==0 の場合は実線、それ以外は点線を描画する
+    # @param [Rect] area チャートの領域
+    # @param [Array<Numeric>] range y の値の範囲
+    # @param [Array<Numeric>] ticks 横線を描画する値のリスト
+    # @note y==0 の場合は実線、それ以外は点線を描画する
     def draw_y_grid(axis, area, range, ticks)
       zero_set = [ :solid, "000" ]
       nonzero_set = [ :dash, "888" ]
@@ -137,10 +143,10 @@ module Charma
     end
 
     # チャート内の垂直線を描画する
-    # area :: チャートの領域
-    # range :: x の値の範囲
-    # ticks :: 横線を描画する値のリスト
-    # x==0 の場合は実線、それ以外は点線を描画する
+    # @param [Rect] area チャートの領域
+    # @param [Array<Numeric>] range x の値の範囲
+    # @param [Array<Numeric>] ticks 横線を描画する値のリスト
+    # @note x==0 の場合は実線、それ以外は点線を描画する
     def draw_x_grid(area, range, ticks)
       zero_set = [ :solid, "000" ]
       nonzero_set = [ :dash, "888" ]
@@ -152,9 +158,9 @@ module Charma
     end
 
     # チャートの左右の縁にある短い水平線(マーク)を描画する
-    # area :: マークの領域
-    # range :: y の値の範囲
-    # ticks :: マークを描画する値のリスト
+    # @param [Rect] area マークの領域
+    # @param [Array<Numeric>] range y の値の範囲
+    # @param [Array<Numeric>] ticks マークを描画する値のリスト
     def draw_y_marks(axis, area, range, ticks)
       opts = {style: :solid, color:"000"}
       ticks.each do |v|
@@ -164,9 +170,9 @@ module Charma
     end
 
     # チャートの下の縁にある短い垂直線(マーク)を描画する
-    # area :: マークの領域
-    # range :: x の値の範囲
-    # ticks :: マークを描画する値のリスト
+    # @param [Rect] area チャートの領域
+    # @param [Array<Numeric>] range x の値の範囲
+    # @param [Array<Numeric>] ticks 横線を描画する値のリスト
     def draw_x_marks(area, range, ticks)
       opts = {style: :solid, color:"000"}
       ticks.each do |v|
@@ -176,9 +182,9 @@ module Charma
     end
 
     # 色のリストをつくる
-    # n :: 作る色の数
-    # n<=6 の場合は、固定の色のリストから取ってくる。
-    # 7<=n の場合は虹色っぽく適当に作る。
+    # @param [Integer] n 作る色の数
+    # @note n<=6 の場合は、固定の色のリストから取ってくる。7<=n の場合は虹色っぽく適当に作る。
+    # @return [Array<String>] 色を表す文字列のリスト
     def seq_colors(n)
       case n
       when 1..6
@@ -202,25 +208,29 @@ module Charma
     end
 
     # 相対位置から絶対位置に変換する
-    # v :: 変換される相対位置
-    # rc :: 領域。左端が xrange[0] ,右端が xrange[1] に対応する。
-    # xrange :: 値の範囲
+    # @param [Numeric] v 変換される相対位置
+    # @param [Rect] rc 領域。左端が xrange[0] ,右端が xrange[1] に対応する。
+    # @param [Array<Numeric>] xrange 値の範囲
+    # @return [Numeric] 引数 v に対応する絶対位置
     def abs_x_position(v, rc, xrange)
       rx, min, max = [ v, *xrange ].map{ |e| scale_value(:x, e) }
       (rx-min) * rc.w / (max-min) + rc.x
     end
 
     # 相対位置から絶対位置に変換する
-    # v :: 変換される相対位置
-    # rc :: 領域。上端が yrange[0] ,下端が yrange[1] に対応する。
-    # yrange :: 値の範囲
+    # @param [Symbol] v の軸。:y または :y2
+    # @param [Numeric] v 変換される相対位置
+    # @param [Rect] rc 領域。上端が yrange[0] ,下端が yrange[1] に対応する。
+    # @param [Array<Numeric>] yrange 値の範囲
+    # @return [Numeric] 引数 v に対応する絶対位置
     def abs_y_position(axis, v, rc, yrange)
       ry, min, max = [ v, *yrange ].map{ |e| scale_value(axis, e) }
       (max-ry) * rc.h / (max-min) + rc.y
     end
 
     # 下端に legend があるかどうか
-    # 系列が複数あり、すべての系列に名前がついていれば 真
+    # @note 系列が複数あり、すべての系列に名前がついていれば 真
+    # @return [Boolean] 下端に legend があるかどうか
     def bottom_legend?
       1 < @chart[:series].size && @chart[:series].all?{ |e| ! e[:name].nil? }
     end
@@ -258,8 +268,8 @@ module Charma
     end
 
     # x_ticks を描画する
-    # area :: x_ticks に使える領域
-    # texts :: x_ticks に描画する文字列のリスト
+    # @params [Rect] area x_ticks に使える領域
+    # @params [Array<String>] texts x_ticks に描画する文字列のリスト
     def draw_x_tick_texts( area, texts )
       rects = area.hsplit( *([1]*texts.size) ).map{ |rc|
         rc.hsplit(1,10,1)[1]
@@ -268,9 +278,9 @@ module Charma
     end
 
     # 下端に legend を描画する
-    # area :: legend を描画する領域
-    # names :: 凡例の各要素のテキスト
-    # colors :: 凡例の各要素の色
+    # @param [Rect] area legend を描画する領域
+    # @param [Array<String>] names 凡例の各要素のテキスト
+    # @param [Array<String>] colors 凡例の各要素の色
     def draw_bottom_regend(area, names, colors)
       ratio = [5,0.5,10,2]
       xcount = (1..names.size).max_by{ |w|

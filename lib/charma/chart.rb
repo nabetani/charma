@@ -5,8 +5,8 @@ module Charma
   class Chart
 
     # 必要とされるオプションであることを示すマーカー
-    # type :: 値の型
-    # inner_type :: 値の要素型。値が Array の場合などに使う。
+    # @param [Class] type 値の型
+    # @param [Class, nil] inner_type 値の要素型。値が Array の場合などに使う。
     def self.required(type, inner_type = nil)
       lambda do |k, v|
         raise Errors::InvalidOption, "#{k} is required" if v.nil?
@@ -19,11 +19,9 @@ module Charma
       end
     end
 
-    # 正の整数
-
     # なくてもいいオプションであることを示すマーカー
-    # type :: 値の型
-    # inner_type :: 値の要素型。値が Array の場合などに使う。
+    # @param [Class] type 値の型
+    # @param [Class, nil] inner_type 値の要素型。値が Array の場合などに使う。
     def self.nil_or(type, inner_type = nil, inner_inner_type = nil)
       lambda do |k, v|
         return if v.nil?
@@ -45,7 +43,7 @@ module Charma
     end
 
     # 引数の値のいずれかである必要があることを示すマーカー
-    # args 値の候補
+    # @param [Array] args 値の候補
     def self.one_of( *args )
       lambda do |k, v|
         okay = args.include?(v)
@@ -54,7 +52,7 @@ module Charma
     end
 
     # Chart を構築する
-    # opts :: オプションを示す Hash。
+    # @param [Hash] opts オプションを示す Hash。
     def initialize(opts)
       @opts = opts
     end

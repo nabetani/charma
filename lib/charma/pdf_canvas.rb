@@ -7,11 +7,12 @@ module Charma
   class PDFCanvas
 
     # PDFCanvas を構築する
-    # pdf :: Prawn::Document 型の、描画ターゲット
+    # @param [Prawn::Document] pdf Prawn::Document 型の、描画ターゲット
     def initialize( pdf )
       @pdf = pdf
     end
 
+    # 
     def utf8_text(name)
       # see https://docs.microsoft.com/en-us/typography/opentype/spec/name
       # see 
@@ -107,9 +108,9 @@ module Charma
     end
 
     # 回転したテキストを描画する
-    # t :: 描画する文字列
-    # rect :: この矩形内に文字列を描画する
-    # angle :: 回転角。90 または 270。
+    # @param [String] t 描画する文字列
+    # @param [Rect] rect この矩形内に文字列を描画する
+    # @param [Numeric] angle 回転角。90 または 270。
     def rottext( t, rect, angle )
       pr = pdf_rect(rect).rot
       @pdf.rotate(angle, origin: pr.center) do
@@ -161,7 +162,7 @@ module Charma
     end
 
     # canvas の色をPDFの色に変換する
-    # color :: 色。3文字の文字列(16進数でRGB)または6文字の文字列(16進数でRRGGBB)。
+    # @param [String] color 色。3文字の文字列(16進数でRGB)または6文字の文字列(16進数でRRGGBB)。
     def pdf_color(color)
       case color.size
       when 3
@@ -203,8 +204,8 @@ module Charma
     end
 
     # 矩形をフィルする
-    # rect :: この矩形をフィルする
-    # color :: この色でフィルする
+    # @param [Rect] rect この矩形をフィルする
+    # @param [String] color この色でフィルする
     def fill_rect( rect, color )
       @pdf.save_graphics_state do
         pr = pdf_rect(rect)
@@ -216,7 +217,7 @@ module Charma
     end
 
     # 矩形の枠を書く
-    # rect :: この矩形の枠を書く
+    # @param [Rect] rect この矩形の枠を書く
     def stroke_rect(rect)
       @pdf.save_graphics_state do
         pr = pdf_rect(rect)
@@ -249,8 +250,8 @@ module Charma
     end
 
     # テキストのサイズを計算する
-    # rects :: この矩形に入るサイズを計算する
-    # texts :: このテキストを描画できるサイズを計算する
+    # @param [Array<Rect>] rects この矩形に入るサイズを計算する
+    # @param [Array<String>] texts このテキストを描画できるサイズを計算する
     # rects[i] の中に texts[i] が描画できるサイズを返す
     def measure_samesize_texts( rects, texts )
       texts.map(&:to_s).zip(rects).map{ |txt,rc|
@@ -261,9 +262,9 @@ module Charma
     end
 
     # 複数の矩形と文字列を指定して、同じ大きさの文字を各矩形に描画する
-    # rects :: 矩形のリスト
-    # texts :: 文字列のリスト
-    # align :: テキストアライメント
+    # @param [Array<Rect>] rects 矩形のリスト
+    # @param [Array<String>] texts 文字列のリスト
+    # @param [Symbol] align テキストアライメント :left, :right, :center のいずれか
     def draw_samesize_texts( rects, texts, align: :center )
       @pdf.save_graphics_state do
         size = measure_samesize_texts( rects, texts )
@@ -273,6 +274,13 @@ module Charma
       end
     end
 
+    # 垂直線を引く
+    # @param [Numeric] top 上端の座標
+    # @param [Numeric] bottom 下端の座標
+    # @param [Numeric] x x座標
+    # @param [Symbol] style 線のスタイル。 :solid, :dash のいずれか。
+    # @param [Symbol] color 色を表す文字列
+    # @param [Symbol] color2 色を表す文字列。 :dash の場合に使う。
     def vertical_line( top, bottom, x, style: :solid, color:"000", color2:"fff" )
       @pdf.save_graphics_state do
         case style
@@ -299,12 +307,12 @@ module Charma
     end
 
     # 水平線を描画する
-    # left :: 左端
-    # right :: 右端
-    # y :: y座標
-    # style :: 線のスタイル。:solid または :dash
-    # color :: 線の色。
-    # color2 :: style が dash の場合に使われる第二の色
+    # @param [Numeric] left 左端
+    # @param [Numeric] right 右端
+    # @param [Numeric] y y座標
+    # @param [Symbol] style 線のスタイル。:solid または :dash
+    # @param [String] color 線の色。
+    # @param [String] color2 style が dash の場合に使われる第二の色
     def horizontal_line( left, right, y, style: :solid, color:"000", color2:nil )
       @pdf.save_graphics_state do
         case style
